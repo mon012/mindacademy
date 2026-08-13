@@ -1,0 +1,487 @@
+{
+  "generatedAt": "2026-08-12T11:48:45.694Z",
+  "pages": [
+    {
+      "route": "/10-ted-for-parent/",
+      "source": "old/10-ted-for-parent/index.html",
+      "redirect": null,
+      "characters": 4481,
+      "outboundLinks": 0,
+      "embeds": 10,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/5-maths-secrets/",
+      "source": "old/5-maths-secrets/index.html",
+      "redirect": null,
+      "characters": 4342,
+      "outboundLinks": 1,
+      "embeds": 2,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/ai-literency-for-kids/",
+      "source": "old/ai-literency-for-kids/index.html",
+      "redirect": null,
+      "characters": 3929,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/articles/",
+      "source": "old/articles/index.html",
+      "redirect": null,
+      "characters": 788,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/author/candide-mind/",
+      "source": "old/author/candide-mind/index.html",
+      "redirect": "/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/author/duangporn-rattanaruang/",
+      "source": "old/author/duangporn-rattanaruang/index.html",
+      "redirect": "/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/author/mon012/",
+      "source": "old/author/mon012/index.html",
+      "redirect": "/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/author/mon012/page/2/",
+      "source": "old/author/mon012/page/2/index.html",
+      "redirect": "/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/author/mon012/page/3/",
+      "source": "old/author/mon012/page/3/index.html",
+      "redirect": "/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/blog/",
+      "source": "old/blog/index.html",
+      "redirect": "/articles/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/blog/page/2/",
+      "source": "old/blog/page/2/index.html",
+      "redirect": null,
+      "characters": 282,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/blog/page/3/",
+      "source": "old/blog/page/3/index.html",
+      "redirect": null,
+      "characters": 232,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/classes/coding/",
+      "source": "old/classes/coding/index.html",
+      "redirect": null,
+      "characters": 1809,
+      "outboundLinks": 0,
+      "embeds": 4,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/classes/eng/",
+      "source": "old/classes/eng/index.html",
+      "redirect": null,
+      "characters": 1727,
+      "outboundLinks": 0,
+      "embeds": 5,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/classes/",
+      "source": "old/classes/index.html",
+      "redirect": null,
+      "characters": 1482,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/classes/pre-inter/",
+      "source": "old/classes/pre-inter/index.html",
+      "redirect": null,
+      "characters": 2652,
+      "outboundLinks": 0,
+      "embeds": 3,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/classes/sam/",
+      "source": "old/classes/sam/index.html",
+      "redirect": null,
+      "characters": 1590,
+      "outboundLinks": 0,
+      "embeds": 5,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/classes/summer/",
+      "source": "old/classes/summer/index.html",
+      "redirect": null,
+      "characters": 1298,
+      "outboundLinks": 0,
+      "embeds": 3,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/classes/thai/",
+      "source": "old/classes/thai/index.html",
+      "redirect": null,
+      "characters": 1810,
+      "outboundLinks": 0,
+      "embeds": 2,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/coding/",
+      "source": "old/coding/index.html",
+      "redirect": "/classes/coding/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/contact/",
+      "source": "old/contact/index.html",
+      "redirect": null,
+      "characters": 495,
+      "outboundLinks": 8,
+      "embeds": 9,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/early-math/",
+      "source": "old/early-math/index.html",
+      "redirect": null,
+      "characters": 4483,
+      "outboundLinks": 2,
+      "embeds": 1,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/ef-กุญแจสำคัญ-สู่ความสำเร/",
+      "source": "old/ef-กุญแจสำคัญ-สู่ความสำเร/index.html",
+      "redirect": "/executive-functions/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/eng/",
+      "source": "old/eng/index.html",
+      "redirect": "/classes/eng/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/eng2/",
+      "source": "old/eng2/index.html",
+      "redirect": "/classes/eng/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/epreinter/",
+      "source": "old/epreinter/index.html",
+      "redirect": null,
+      "characters": 2745,
+      "outboundLinks": 0,
+      "embeds": 2,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/executive-functions/",
+      "source": "old/executive-functions/index.html",
+      "redirect": null,
+      "characters": 9728,
+      "outboundLinks": 3,
+      "embeds": 3,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/ikigai-for-kids/",
+      "source": "old/ikigai-for-kids/index.html",
+      "redirect": null,
+      "characters": 18759,
+      "outboundLinks": 1,
+      "embeds": 4,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/",
+      "source": "old/index.html",
+      "redirect": null,
+      "characters": 928,
+      "outboundLinks": 0,
+      "embeds": 5,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/kids-millionaire/",
+      "source": "old/kids-millionaire/index.html",
+      "redirect": null,
+      "characters": 2968,
+      "outboundLinks": 0,
+      "embeds": 2,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/learn-english-kids/",
+      "source": "old/learn-english-kids/index.html",
+      "redirect": null,
+      "characters": 4486,
+      "outboundLinks": 2,
+      "embeds": 3,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/learn-singapore-math/",
+      "source": "old/learn-singapore-math/index.html",
+      "redirect": null,
+      "characters": 6395,
+      "outboundLinks": 0,
+      "embeds": 6,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/page/2/",
+      "source": "old/page/2/index.html",
+      "redirect": null,
+      "characters": 928,
+      "outboundLinks": 0,
+      "embeds": 5,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/page/3/",
+      "source": "old/page/3/index.html",
+      "redirect": null,
+      "characters": 928,
+      "outboundLinks": 0,
+      "embeds": 5,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/positive-talk-with-kids/",
+      "source": "old/positive-talk-with-kids/index.html",
+      "redirect": null,
+      "characters": 17569,
+      "outboundLinks": 0,
+      "embeds": 1,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/pre-inter/",
+      "source": "old/pre-inter/index.html",
+      "redirect": "/classes/pre-inter/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/privacy-policy/",
+      "source": "old/privacy-policy/index.html",
+      "redirect": null,
+      "characters": 7348,
+      "outboundLinks": 1,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/quant-for-kids/",
+      "source": "old/quant-for-kids/index.html",
+      "redirect": null,
+      "characters": 11709,
+      "outboundLinks": 6,
+      "embeds": 2,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/sam/",
+      "source": "old/sam/index.html",
+      "redirect": "/classes/sam/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/sc26/",
+      "source": "old/sc26/index.html",
+      "redirect": null,
+      "characters": 2111,
+      "outboundLinks": 4,
+      "embeds": 7,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/sg1/",
+      "source": "old/sg1/index.html",
+      "redirect": null,
+      "characters": 1170,
+      "outboundLinks": 4,
+      "embeds": 9,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/singapore-learn-math/",
+      "source": "old/singapore-learn-math/index.html",
+      "redirect": null,
+      "characters": 3257,
+      "outboundLinks": 1,
+      "embeds": 1,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/sm1/",
+      "source": "old/sm1/index.html",
+      "redirect": null,
+      "characters": 3261,
+      "outboundLinks": 4,
+      "embeds": 6,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/summer/",
+      "source": "old/summer/index.html",
+      "redirect": "/classes/summer/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/tag/coding/",
+      "source": "old/tag/coding/index.html",
+      "redirect": null,
+      "characters": 119,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/tag/english/",
+      "source": "old/tag/english/index.html",
+      "redirect": null,
+      "characters": 76,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/tag/math/",
+      "source": "old/tag/math/index.html",
+      "redirect": null,
+      "characters": 296,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/tag/math/page/2/",
+      "source": "old/tag/math/page/2/index.html",
+      "redirect": null,
+      "characters": 69,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/thai/",
+      "source": "old/thai/index.html",
+      "redirect": "/classes/thai/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/tk/",
+      "source": "old/tk/index.html",
+      "redirect": null,
+      "characters": 393,
+      "outboundLinks": 4,
+      "embeds": 4,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/uncategorized/",
+      "source": "old/uncategorized/index.html",
+      "redirect": "/blog/",
+      "characters": 0,
+      "outboundLinks": 0,
+      "embeds": 0,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/why-kids-coding/",
+      "source": "old/why-kids-coding/index.html",
+      "redirect": null,
+      "characters": 6828,
+      "outboundLinks": 0,
+      "embeds": 4,
+      "pdfReferences": 0
+    },
+    {
+      "route": "/why-singapore-math/",
+      "source": "old/why-singapore-math/index.html",
+      "redirect": null,
+      "characters": 4529,
+      "outboundLinks": 3,
+      "embeds": 0,
+      "pdfReferences": 0
+    }
+  ],
+  "assets": {
+    "referenced": 166,
+    "copied": 166,
+    "missing": 0
+  }
+}

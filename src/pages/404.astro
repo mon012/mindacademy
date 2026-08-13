@@ -1,0 +1,18 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+<SiteLayout
+  title="ไม่พบหน้าที่ต้องการ | Mind Academy"
+  description="ไม่พบหน้าที่คุณกำลังค้นหา"
+  indexable={false}
+>
+  <section class="not-found-page">
+    <p class="not-found-code" aria-hidden="true">404</p>
+    <h1>ไม่พบหน้าที่ต้องการ</h1>
+    <p>หน้าที่คุณกำลังค้นหาอาจถูกย้ายหรือไม่มีอยู่แล้ว</p>
+    <div class="not-found-actions">
+      <a href="/">กลับหน้าแรก</a>
+      <a href="/classes/">ดูหลักสูตร</a>
+    </div>
+  </section>
+</SiteLayout>

@@ -1,0 +1,274 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+export function getStaticPaths() {
+  const pageFiles = import.meta.glob('../content/pages/**/*.json', { eager: true });
+  return Object.values(pageFiles).map((mod: any) => {
+    const page = mod.default;
+    return {
+      params: { slug: page.route === '/' ? undefined : page.route.replace(/^\//, '').replace(/\/$/, '') },
+      props: { page },
+    };
+  });
+}
+
+const { page } = Astro.props;
+const productionOrigin = 'https://mindacademythai.com';
+const absoluteUrl = (value: string) => new URL(value, productionOrigin).href;
+const articleTypes = new Set(['Article', 'BlogPosting']);
+const legacyGraph = (page.jsonLd || []).flatMap((item: string) => {
+  try {
+    const parsed = JSON.parse(item);
+    return parsed['@graph'] || [parsed];
+  } catch {
+    return [];
+  }
+});
+const legacyArticle = legacyGraph.find((item: any) => articleTypes.has(item['@type']));
+const legacyImageId = legacyArticle?.image?.['@id'];
+const legacyImage = legacyGraph.find((item: any) => item['@type'] === 'ImageObject' && item.url && (
+  !legacyImageId || item['@id'] === legacyImageId
+));
+const organizationId = `${productionOrigin}/#organization`;
+const websiteId = `${productionOrigin}/#website`;
+const organizationSchema = {
+  '@type': 'EducationalOrganization',
+  '@id': organizationId,
+  name: 'Mind Academy',
+  url: `${productionOrigin}/`,
+  logo: absoluteUrl('/assets/wp-content/uploads/2024/09/MA320.webp'),
+  sameAs: [
+    'https://www.facebook.com/mindacademythai',
+    'https://www.youtube.com/@mindacademy9724',
+  ],
+};
+const websiteSchema = {
+  '@type': 'WebSite',
+  '@id': websiteId,
+  url: `${productionOrigin}/`,
+  name: 'Mind Academy',
+  publisher: { '@id': organizationId },
+  inLanguage: 'th-TH',
+};
+const pageUrl = absoluteUrl(page.route);
+const primarySchema = page.kind === 'article-page'
+  ? {
+      '@type': 'Article',
+      '@id': `${pageUrl}#article`,
+      headline: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
+      description: page.description,
+      url: pageUrl,
+      mainEntityOfPage: pageUrl,
+      ...(legacyArticle?.datePublished ? { datePublished: legacyArticle.datePublished } : {}),
+      ...(legacyArticle?.dateModified ? { dateModified: legacyArticle.dateModified } : {}),
+      ...(legacyImage?.url ? { image: absoluteUrl(legacyImage.url.replace(/^\/wp-content\//, '/assets/wp-content/')) } : {}),
+      publisher: { '@id': organizationId },
+      inLanguage: 'th-TH',
+    }
+  : page.route.startsWith('/classes/') && page.route !== '/classes/'
+    ? {
+        '@type': 'Service',
+        '@id': `${pageUrl}#service`,
+        name: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
+        description: page.description,
+        url: pageUrl,
+        provider: { '@id': organizationId },
+      }
+    : page.route === '/articles/' || page.route === '/classes/' || page.kind === 'archive-page'
+      ? {
+          '@type': 'CollectionPage',
+          '@id': `${pageUrl}#collection`,
+          name: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
+          url: pageUrl,
+          ...(page.description ? { description: page.description } : {}),
+          isPartOf: { '@id': websiteId },
+          inLanguage: 'th-TH',
+        }
+      : page.route === '/contact/'
+        ? {
+            '@type': 'ContactPage',
+            '@id': `${pageUrl}#contact`,
+            name: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
+            url: pageUrl,
+            isPartOf: { '@id': websiteId },
+            inLanguage: 'th-TH',
+          }
+        : {
+            '@type': 'WebPage',
+            '@id': `${pageUrl}#webpage`,
+            name: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
+            url: pageUrl,
+            ...(page.description ? { description: page.description } : {}),
+            isPartOf: { '@id': websiteId },
+            inLanguage: 'th-TH',
+          };
+const normalizedJsonLd = page.redirect || page.route === '/tk/' ? [] : [JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [organizationSchema, websiteSchema, primarySchema],
+})];
+const homepageCopy = new Map([
+  ['Tailored Education for the Digital Age: Preparing Kids for Tomorrow', 'พื้นที่เรียนรู้ที่เด็กได้ทั้งความรู้และความสุข'],
+  ['เรียนรู้ผ่านการเล่นและกิจกรรม', 'สนุกกับการเรียน เข้าใจสิ่งที่ทำ'],
+  ['เราเชื่อว่าการเรียนรู้ที่ดีที่สุดเกิดขึ้นเมื่อเด็กๆ สนุกสนานและมีส่วนร่วม หลักสูตรของเราออกแบบมาเพื่อกระตุ้นความอยากรู้อยากเห็นและความคิดสร้างสรรค์ผ่านกิจกรรมที่หลากหลาย', 'เด็กได้คิด ลงมือทำ และมีส่วนร่วมกับบทเรียน บรรยากาศที่ผ่อนคลายช่วยให้เด็กเปิดใจเรียนรู้ กล้าลอง และเข้าใจสิ่งที่เรียนได้ดีขึ้น'],
+  ['พัฒนาทักษะรอบด้านสำหรับอนาคต', 'เรียนให้เข้าใจ ไม่เร่งและไม่กดดัน'],
+  ['นอกจากความรู้ทางวิชาการ เรามุ่งเน้นการพัฒนาทักษะสำคัญสำหรับศตวรรษที่ 21 เช่น การคิดวิเคราะห์ การทำงานเป็นทีม และความคิดสร้างสรรค์', 'เราให้ความสำคัญกับพื้นฐานและกระบวนการคิด เด็กแต่ละคนจึงมีพื้นที่ค่อยๆ ทำความเข้าใจ ถามในสิ่งที่สงสัย และพัฒนาไปตามจังหวะของตัวเอง'],
+  ['ครูผู้เชี่ยวชาญและหลักสูตรที่ทันสมัย', 'กล้าคิด กล้าถาม และมั่นใจขึ้น'],
+  ['ทีมครูของเราผ่านการฝึกอบรมพิเศษในการสอนแบบ play-based learning และหลักสูตรของเราได้รับการปรับปรุงอย่างสม่ำเสมอเพื่อให้ทันต่อการเปลี่ยนแปลงของโลก', 'ครูเฉพาะด้านคอยชวนคิด รับฟัง และให้คำแนะนำโดยไม่สร้างความกดดัน เด็กจึงกล้าถาม กล้าลอง และค่อยๆ มั่นใจในความสามารถของตัวเอง'],
+  ['Success Stories:', 'เสียงจากผู้ปกครองและนักเรียน'],
+  ['เรื่องราวความสำเร็จจากนักเรียนของเรา', 'ฟังประสบการณ์จริงจากครอบครัวที่เรียนกับ Mind Academy'],
+  ['เราเชื่อว่าการเรียนรู้ควรสนุกและมีความหมาย เราสร้างสภาพแวดล้อมที่ปลอดภัยและสร้างสรรค์ เพื่อให้เด็กๆ ได้พัฒนาทักษะการคิดวิเคราะห์และความมั่นใจในตนเอง ผ่านหลักสูตรที่ออกแบบมาเฉพาะ โดยทีมครูผู้เชี่ยวชาญของเรา', 'เราอยากให้ Mind Academy เป็นพื้นที่ที่เด็กไม่ต้องเลือกระหว่างความสนุกกับความรู้ ทุกคลาสจึงให้เด็กได้คิดและลงมือทำ ในบรรยากาศที่ผ่อนคลายและเป็นมิตร เด็กจะได้พื้นฐานที่นำไปใช้ต่อได้จริง พร้อมความมั่นใจว่าการเรียนรู้ไม่จำเป็นต้องเป็นเรื่องเครียด'],
+]);
+const migratedContent = page.route === '/'
+  ? [...homepageCopy].reduce((content, [from, to]) => content.replace(from, to), page.content)
+  : page.route === '/classes/'
+    ? page.content
+        .replace('<h1>Mind Classes</h1>', '<h1>หลักสูตรของ Mind Academy</h1>')
+        .replace('เราใช้การเรียนรู้ผ่านการเล่นและกิจกรรม ผ่านบทเรียนที่ออกแบบมาอย่างพิถีพิถันเพื่อพัฒนาทักษะการคิดวิเคราะห์และความมั่นใจในตนเอง วิธีการเรียนการสอนของเราเน้นการมีส่วนร่วม ส่งเสริมการเรียนรู้อย่างสนุกสนานและมีประสิทธิภาพ ซึ่งช่วยให้เด็กๆ สามารถนำไปใช้ได้ในชีวิตจริง', 'สำรวจคลาสเรียนที่ช่วยให้เด็กๆ ได้คิด ลงมือทำ และเรียนรู้อย่างสนุกในจังหวะที่เหมาะกับตัวเอง')
+        .replaceAll(' target="_blank" rel="noopener noreferrer"', '')
+  : page.route === '/classes/sam/'
+    ? page.content.replaceAll('Singapore Math™️', 'Singapore Math')
+  : page.route === '/classes/pre-inter/'
+    ? page.content.replace('ติดต่อเราเพื่อขอข้อมูลเพิ่มเติม พร้อมโปรโมชั่นพิเศษ', 'รับข้อมูลเพิ่มเติม พร้อมโปรโมชั่นพิเศษ')
+  : page.route === '/ikigai-for-kids/'
+    ? page.content.replace(
+        '<h1 class="wp-block-heading has-text-align-left">ทำไมต้อง Ikigai ในยุค AI?</h1>',
+        '<h2 class="wp-block-heading has-text-align-left">ทำไมต้อง Ikigai ในยุค AI?</h2>',
+      )
+  : page.content;
+const embedTitle = (tag: string) => {
+  const src = tag.match(/\bsrc=["']([^"']+)/i)?.[1] || '';
+  if (src.includes('google.com/maps')) return 'แผนที่ Mind Academy';
+  if (src.includes('facebook.com')) return 'วิดีโอจาก Facebook';
+  if (src.includes('youtube.com') || src.includes('youtu.be')) return 'วิดีโอจาก YouTube';
+  if (src.includes('gumlet.io')) return 'วิดีโอ Mind Academy';
+  if (src.includes('ted.com')) return 'วิดีโอ TED';
+  return 'เนื้อหาฝังจากเว็บไซต์ภายนอก';
+};
+const cleanPageTitle = page.title.replace(/\s*[»|].*$/, '').trim();
+const escapeAttribute = (value: string) => value
+  .replaceAll('&', '&amp;')
+  .replaceAll('"', '&quot;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;');
+const isUnusableAlt = (value: string) => !value.trim()
+  || /(?:à¸|à¹|&#\d{2,};)/i.test(value)
+  || /^(?:img|image|photo|picture|รูป|ภาพ)$/i.test(value.trim());
+const imageAlt = (tag: string) => {
+  const current = tag.match(/\balt=["']([^"']*)["']/i)?.[1] || '';
+  if (!isUnusableAlt(current)) return current;
+  const title = tag.match(/\btitle=["']([^"']+)["']/i)?.[1] || '';
+  if (!isUnusableAlt(title)) return title;
+  return cleanPageTitle;
+};
+const setImageAlt = (tag: string, alt: string) => {
+  const withoutAlt = tag.replace(/\s+alt=["'][^"']*["']/i, '');
+  return withoutAlt.replace('<img', `<img alt="${escapeAttribute(alt)}"`);
+};
+let iframeIndex = 0;
+const eagerFirstEmbedRoutes = new Set([
+  '/classes/sam/', '/classes/eng/', '/classes/coding/', '/classes/thai/',
+  '/classes/pre-inter/', '/classes/summer/',
+]);
+const firstIframeOffset = migratedContent.search(/<iframe\b/i);
+const renderedContent = migratedContent
+  .replace(/(<a\b[^>]*\btitle=["']Permalink to ([^"']+)["'][^>]*>\s*)(<img\b[^>]*>)/gi, (_match, anchor, linkedTitle, image) => (
+    `${anchor}${setImageAlt(image, linkedTitle)}`
+  ))
+  .replaceAll('https://player-api.gumlet.io/embed/', 'https://play.gumlet.io/embed/')
+  .replace(/https:\/\/mindacademy\.gumlet\.io\/wp-content\/uploads\/2025\/01\/[^"']*Ikigai[^"']*12\.08\.29-PM\.jpg\?compress=true/gi, '/assets/wp-content/uploads/2025/01/ikigai-for-kids-application.jpg')
+  .replace(/https:\/\/mindacademy\.gumlet\.io\/wp-content\/uploads\/2025\/01\/[^"']*Ikigai[^"']*visual-selection-e1737437095302\.png\?compress=true/gi, '/assets/wp-content/uploads/2025/01/ikigai-for-kids-four-pillars.png')
+  .replace(/<iframe\b[^>]*>/gi, (tag) => {
+    const isFirstEmbed = iframeIndex++ === 0 && eagerFirstEmbedRoutes.has(page.route);
+    let clean = tag.replace(/\s(?:width|height)=["']undefined["']/gi, '');
+    if (!/\btitle\s*=/i.test(clean)) clean = clean.replace('<iframe', `<iframe title="${embedTitle(clean)}"`);
+    clean = clean.replace(/\sloading=["'][^"']*["']/i, '');
+    clean = clean.replace('<iframe', `<iframe loading="${isFirstEmbed ? 'eager' : 'lazy'}"`);
+    return clean;
+  })
+  .replace(/<img\b[^>]*>/gi, (tag, offset) => {
+    let clean = setImageAlt(tag, imageAlt(tag));
+    if (!/\bdecoding\s*=/i.test(clean)) clean = clean.replace('<img', '<img decoding="async"');
+    if (page.route === '/why-singapore-math/' && clean.includes('cdn-images-1.medium.com') && !/\bwidth\s*=/i.test(clean)) clean = clean.replace('<img', '<img width="941" height="530"');
+    if (!/\bdata-image-component\b/i.test(clean)) clean = clean.replace('<img', '<img data-image-component="true"');
+    clean = clean.replace(/\sloading=["'][^"']*["']/i, '');
+    const isPriorityImage = page.route !== '/'
+      && /\bfetchpriority=["']high["']/i.test(clean)
+      && (firstIframeOffset === -1 || offset < firstIframeOffset);
+    clean = clean.replace(/\sfetchpriority=["'][^"']*["']/i, '');
+    if (isPriorityImage) clean = clean.replace('<img', '<img fetchpriority="high"');
+    clean = clean.replace('<img', `<img loading="${isPriorityImage ? 'eager' : 'lazy'}"`);
+    return clean;
+  })
+  .replace(/<a\b([^>]*)>\s*(<img\b[^>]*>)\s*<\/a>/gi, (match, attributes, image) => {
+    if (/\baria-label\s*=/i.test(attributes)) return match;
+    const label = image.match(/\balt=["']([^"']+)["']/i)?.[1] || `ดูภาพจาก ${cleanPageTitle}`;
+    return `<a${attributes} aria-label="${label}">${image}</a>`;
+  });
+const hasDeftForm = renderedContent.includes('class="deftform"');
+---
+<SiteLayout
+  title={page.title}
+  description={page.route === '/tk/' ? 'ขอบคุณที่ติดต่อ Mind Academy ดูข้อมูลสาขาและช่องทางติดต่อเพิ่มเติม' : page.description}
+  canonical={page.canonical}
+  bodyClass={page.bodyClass}
+  redirect={page.redirect}
+  jsonLd={normalizedJsonLd}
+  indexable={page.route !== '/tk/'}
+>
+  {page.redirect ? (
+    <section class="redirect-page">
+      <h1>กำลังพาไปยังหน้าที่ต้องการ</h1>
+      <p><a href={page.redirect}>ไปต่อที่ {page.redirect}</a></p>
+    </section>
+  ) : (
+    <>
+      {page.route === '/' && (
+        <section class="ocean-hero" aria-labelledby="ocean-title">
+          <div class="ocean-copy">
+            <h1 id="ocean-title">เรียนสนุก เข้าใจจริง<br />เติบโตอย่างมั่นใจ</h1>
+            <p>พื้นที่ที่เด็กๆ ได้คิดและลงมือทำ เรียนรู้อย่างผ่อนคลาย ได้ทั้งพื้นฐานที่แข็งแรงและความสุข สนุกระหว่างทาง</p>
+            <div class="ocean-actions"><a class="primary-ocean-action" href="/classes/">ดูคลาสเรียนทั้งหมด</a><a class="secondary-ocean-action" href="#why-mind">ทำไมต้อง Mind Academy</a></div>
+          </div>
+          <div class="octopus-navigator">
+            <img data-image-component="true" src="/assets/brand/mind-octopus.webp" alt="มาสคอทปลาหมึก Mind Academy" width="1024" height="1024" loading="eager" fetchpriority="high" />
+            <a class="course-bubble math" href="/classes/sam/"><strong>Singapore Math</strong><span>จัดกลุ่มตามระดับ</span></a>
+            <a class="course-bubble english" href="/classes/eng/"><strong>English</strong><span>ฟัง พูด อ่าน เขียน</span></a>
+            <a class="course-bubble coding" href="/classes/coding/"><strong>Coding</strong><span>คิดเป็นขั้นตอน</span></a>
+            <a class="course-bubble thai" href="/classes/thai/"><strong>ภาษาไทย</strong><span>อ่านและเขียน</span></a>
+            <a class="course-bubble confidence" href="/classes/"><strong>วิชาเสริมอื่นๆ</strong><span>เรียนอย่างผ่อนคลาย</span></a>
+          </div>
+          <div class="reef-line" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        </section>
+      )}
+      {page.route === '/' && <span id="why-mind" class="anchor-target" aria-hidden="true"></span>}
+      <article class:list={['legacy-content', page.kind]} set:html={renderedContent} />
+      {hasDeftForm && <script is:inline src="https://cdn.deftform.com/embed.js"></script>}
+      {page.route === '/' && (
+        <section class="classroom-reels" aria-labelledby="classroom-reels-title">
+          <div class="classroom-reels__inner">
+            <div class="classroom-reels__heading">
+              <h2 id="classroom-reels-title">ตามดูความสนุกในห้องเรียน</h2>
+              <p>ช่วงเวลาจริงจากคลาสที่เด็กๆ ได้คิด ลงมือทำ และเรียนรู้อย่างเป็นธรรมชาติ</p>
+            </div>
+            <div class="classroom-reels__track" aria-label="คลิปบรรยากาศการเรียน เลื่อนซ้ายขวาเพื่อดูเพิ่มเติม">
+              {[
+                '1596914968500637', '1517295700440541', '27940496045566936',
+                '1777094457068710', '1674780813820761', '2066312910624618', '1170410918196200',
+              ].map((id, index) => {
+                const reelUrl = `https://www.facebook.com/reel/${id}/`;
+                const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(reelUrl)}&show_text=false&autoplay=false`;
+                return (
+                  <article class="classroom-reel">
+                    <div class="classroom-reel__frame">
+                      <iframe data-src={embedUrl} title={`บรรยากาศการเรียน Mind Academy คลิปที่ ${index + 1}`} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+    </>
+  )}
+</SiteLayout>
