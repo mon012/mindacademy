@@ -164,6 +164,7 @@ const setImageAlt = (tag: string, alt: string) => {
   const withoutAlt = tag.replace(/\s+alt=["'][^"']*["']/i, '');
   return withoutAlt.replace('<img', `<img alt="${escapeAttribute(alt)}"`);
 };
+const lineIcon = '<svg aria-hidden="true" viewBox="0 0 48 48"><path fill="currentColor" d="M25.12 44.52c-2.11 1.16-2.02-.55-1.93-1.08l.3-1.78c.07-.54.14-1.36-.07-1.89-.23-.58-1.16-.88-1.85-1.03C11.48 37.42 4.01 30.4 4.01 22.03 4.01 12.68 13.43 5.08 25 5.08S46 12.68 46 22.03c0 10.49-11.13 17.13-20.88 22.49ZM18.37 25.85c0-.56-.46-1.02-1.02-1.02h-2.86v-6.68c0-.56-.46-1.01-1.02-1.01-.57 0-1.03.45-1.03 1.01v7.7c0 .56.46 1.01 1.03 1.01h3.88c.56 0 1.02-.45 1.02-1.01Zm2.99-7.7c0-.56-.46-1.01-1.03-1.01-.56 0-1.02.45-1.02 1.01v7.7c0 .56.46 1.01 1.02 1.01.57 0 1.03-.45 1.03-1.01v-7.7Zm9.34 0c0-.56-.46-1.01-1.03-1.01-.56 0-1.02.45-1.02 1.01v4.76l-3.98-5.37a1.03 1.03 0 0 0-1.14-.35c-.42.14-.7.53-.7.96v7.7c0 .56.46 1.01 1.02 1.01.57 0 1.03-.45 1.03-1.01v-4.76l3.98 5.37c.19.25.5.4.82.4.1 0 .21-.01.32-.05.42-.14.7-.52.7-.96v-7.7Zm6.28 2.83h-2.86v-1.81h2.86c.56 0 1.02-.46 1.02-1.02s-.46-1.01-1.02-1.01H33.1c-.57 0-1.03.45-1.03 1.01v7.7c0 .56.46 1.01 1.03 1.01h3.88c.56 0 1.02-.45 1.02-1.01s-.46-1.02-1.02-1.02h-2.86v-1.81h2.86c.56 0 1.02-.46 1.02-1.02s-.46-1.02-1.02-1.02Z"/></svg>';
 let iframeIndex = 0;
 const eagerFirstEmbedRoutes = new Set([
   '/classes/sam/', '/classes/eng/', '/classes/coding/', '/classes/thai/',
@@ -171,6 +172,7 @@ const eagerFirstEmbedRoutes = new Set([
 ]);
 const firstIframeOffset = migratedContent.search(/<iframe\b/i);
 const renderedContent = migratedContent
+  .replace(/(<a\b[^>]*href=["'][^"']*lin\.ee[^"']*["'][^>]*>[\s\S]*?<span class=["']gb-icon["']>)<svg\b[\s\S]*?<\/svg>/gi, `$1${lineIcon}`)
   .replace(/(<a\b[^>]*\btitle=["']Permalink to ([^"']+)["'][^>]*>\s*)(<img\b[^>]*>)/gi, (_match, anchor, linkedTitle, image) => (
     `${anchor}${setImageAlt(image, linkedTitle)}`
   ))

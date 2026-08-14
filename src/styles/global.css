@@ -234,6 +234,12 @@ p, li { font-size: var(--type-body); text-wrap: pretty; }
 .page-id-354 .gb-grid-column:nth-child(2) div[style*='aspect-ratio'] { min-height: 0; margin-bottom: 24px; border: 0; border-radius: 12px; box-shadow: none; }
 .page-id-354 h3 { margin: 0 0 12px; color: var(--navy); font-size: clamp(1.8rem, 3vw, 2.5rem); line-height: 1.15; }
 .page-id-354 .gb-grid-column p { margin: 8px 0; }
+.page-id-354 .gb-grid-column p:has(a[href^='tel:']) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.page-id-354 .gb-grid-column p:has(a[href^='tel:']) .gb-icon { flex: 0 0 auto; }
 .page-id-354 .gb-button { margin: 18px 8px 0 0; font-size: 18px; }
 .page-id-354 .gb-button[href*='lin.ee'] { border-color: #06c755; background: #06c755; color: white; }
 .page-id-354 .gb-button[href*='facebook.com'] { border-color: #1877f2; background: #1877f2; color: white; }
@@ -415,7 +421,7 @@ a:hover { color: var(--orange-dark); }
 .site-header nav a::before { height: 2px; background: #46c4c4; }
 .header-action, .gb-button, .wp-block-button__link, input[type='submit'], button { border: 1.5px solid var(--navy); border-radius: 12px; background: var(--navy); color: white; box-shadow: none; }
 .header-action:hover, .gb-button:hover, .wp-block-button__link:hover { background: #35bdb7; color: var(--navy); }
-.site-header .header-action { min-height: 54px; padding: 13px 24px 11px; border-color: #06c755; background: #06c755; color: white; font-size: 18px; line-height: 1.35; white-space: nowrap; }
+.site-header .header-action { min-height: 54px; padding: 11px 24px; border-color: #06c755; background: #06c755; color: white; font-size: 18px; line-height: 1.35; white-space: nowrap; }
 .site-header .header-action span { display: block; padding-block: 2px; }
 .site-header .header-action:hover { border-color: #05b64d; background: #05b64d; color: white; }
 .site-header .header-action {
