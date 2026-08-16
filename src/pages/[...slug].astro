@@ -1,22 +1,37 @@
 ---
+import { getCollection, type CollectionEntry } from 'astro:content';
 import SiteLayout from '../layouts/SiteLayout.astro';
+import { assetExists, candidatesFor, finalDestination } from '../lib/images';
+import { branches } from '../lib/branches';
 
-export function getStaticPaths() {
-  const pageFiles = import.meta.glob('../content/pages/**/*.json', { eager: true });
-  return Object.values(pageFiles).map((mod: any) => {
-    const page = mod.default;
-    return {
-      params: { slug: page.route === '/' ? undefined : page.route.replace(/^\//, '').replace(/\/$/, '') },
-      props: { page },
-    };
-  });
+type Page = CollectionEntry<'pages'>['data'];
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  return pages.map((entry) => ({
+    params: {
+      slug: entry.data.route === '/' ? undefined : entry.data.route.replace(/^\//, '').replace(/\/$/, ''),
+    },
+    props: { page: entry.data },
+  }));
 }
 
-const { page } = Astro.props;
+const { page } = Astro.props as { page: Page };
 const productionOrigin = 'https://mindacademythai.com';
 const absoluteUrl = (value: string) => new URL(value, productionOrigin).href;
+
+/** Strips the site suffix WordPress appended to every title. */
+const cleanPageTitle = page.title.replace(/\s*[»|].*$/, '').trim();
+
+/**
+ * Google truncates titles around 60 characters. Where the WordPress
+ * "» Mind Academy" suffix is what pushes a title over, drop it — Google appends
+ * the site name itself, so nothing is lost.
+ */
+const seoTitle = page.title.length > 60 ? cleanPageTitle : page.title;
+
 const articleTypes = new Set(['Article', 'BlogPosting']);
-const legacyGraph = (page.jsonLd || []).flatMap((item: string) => {
+const legacyGraph = page.jsonLd.flatMap((item) => {
   try {
     const parsed = JSON.parse(item);
     return parsed['@graph'] || [parsed];
@@ -29,19 +44,46 @@ const legacyImageId = legacyArticle?.image?.['@id'];
 const legacyImage = legacyGraph.find((item: any) => item['@type'] === 'ImageObject' && item.url && (
   !legacyImageId || item['@id'] === legacyImageId
 ));
+
 const organizationId = `${productionOrigin}/#organization`;
 const websiteId = `${productionOrigin}/#website`;
+const contactUrl = `${productionOrigin}/contact/`;
+const branchSchemas = branches.map((branch, index) => ({
+  '@type': ['EducationalOrganization', 'LocalBusiness'],
+  '@id': `${productionOrigin}/#branch-${index + 1}`,
+  name: branch.name,
+  parentOrganization: { '@id': organizationId },
+  url: contactUrl,
+  telephone: branch.telephone,
+  image: absoluteUrl('/assets/wp-content/uploads/2024/09/MA320.webp'),
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: branch.streetAddress,
+    addressLocality: branch.addressLocality,
+    addressRegion: branch.addressRegion,
+    addressCountry: 'TH',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: branch.latitude,
+    longitude: branch.longitude,
+  },
+}));
 const organizationSchema = {
   '@type': 'EducationalOrganization',
   '@id': organizationId,
   name: 'Mind Academy',
   url: `${productionOrigin}/`,
   logo: absoluteUrl('/assets/wp-content/uploads/2024/09/MA320.webp'),
+  telephone: branches[0].telephone,
+  areaServed: ['กรุงเทพมหานคร', 'นนทบุรี', 'สมุทรปราการ'],
+  department: branchSchemas.map((branch) => ({ '@id': branch['@id'] })),
   sameAs: [
     'https://www.facebook.com/mindacademythai',
     'https://www.youtube.com/@mindacademy9724',
   ],
 };
+const author = { '@type': 'Person', name: 'PK' };
 const websiteSchema = {
   '@type': 'WebSite',
   '@id': websiteId,
@@ -51,90 +93,88 @@ const websiteSchema = {
   inLanguage: 'th-TH',
 };
 const pageUrl = absoluteUrl(page.route);
+const isClassDetail = page.route.startsWith('/classes/') && page.route !== '/classes/';
+const isCollection = page.route === '/articles/' || page.route === '/classes/';
+const legacyImagePath = legacyImage?.url
+  ? new URL(legacyImage.url, productionOrigin).pathname.replace(/^\/wp-content\//, '/assets/wp-content/')
+  : undefined;
+const legacyArticleImage = legacyImagePath && assetExists(legacyImagePath)
+  ? absoluteUrl(legacyImagePath)
+  : undefined;
+
 const primarySchema = page.kind === 'article-page'
   ? {
       '@type': 'Article',
       '@id': `${pageUrl}#article`,
-      headline: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
+      headline: cleanPageTitle,
       description: page.description,
       url: pageUrl,
       mainEntityOfPage: pageUrl,
       ...(legacyArticle?.datePublished ? { datePublished: legacyArticle.datePublished } : {}),
       ...(legacyArticle?.dateModified ? { dateModified: legacyArticle.dateModified } : {}),
-      ...(legacyImage?.url ? { image: absoluteUrl(legacyImage.url.replace(/^\/wp-content\//, '/assets/wp-content/')) } : {}),
+      ...(legacyArticleImage ? { image: legacyArticleImage } : {}),
+      author,
       publisher: { '@id': organizationId },
       inLanguage: 'th-TH',
     }
-  : page.route.startsWith('/classes/') && page.route !== '/classes/'
+  : isClassDetail
     ? {
         '@type': 'Service',
         '@id': `${pageUrl}#service`,
-        name: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
+        name: cleanPageTitle,
         description: page.description,
         url: pageUrl,
         provider: { '@id': organizationId },
       }
-    : page.route === '/articles/' || page.route === '/classes/' || page.kind === 'archive-page'
-      ? {
-          '@type': 'CollectionPage',
-          '@id': `${pageUrl}#collection`,
-          name: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
-          url: pageUrl,
-          ...(page.description ? { description: page.description } : {}),
-          isPartOf: { '@id': websiteId },
-          inLanguage: 'th-TH',
-        }
-      : page.route === '/contact/'
-        ? {
-            '@type': 'ContactPage',
-            '@id': `${pageUrl}#contact`,
-            name: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
-            url: pageUrl,
-            isPartOf: { '@id': websiteId },
-            inLanguage: 'th-TH',
-          }
-        : {
-            '@type': 'WebPage',
-            '@id': `${pageUrl}#webpage`,
-            name: page.title.replace(/\s*»\s*Mind Academy\s*$/, ''),
-            url: pageUrl,
-            ...(page.description ? { description: page.description } : {}),
-            isPartOf: { '@id': websiteId },
-            inLanguage: 'th-TH',
-          };
-const normalizedJsonLd = page.redirect || page.route === '/tk/' ? [] : [JSON.stringify({
+    : {
+        '@type': isCollection ? 'CollectionPage' : page.route === '/contact/' ? 'ContactPage' : 'WebPage',
+        '@id': `${pageUrl}#${isCollection ? 'collection' : page.route === '/contact/' ? 'contact' : 'webpage'}`,
+        name: cleanPageTitle,
+        url: pageUrl,
+        ...(page.description ? { description: page.description } : {}),
+        isPartOf: { '@id': websiteId },
+        inLanguage: 'th-TH',
+      };
+
+// Breadcrumbs mirror the real site structure: class detail pages sit under
+// /classes/, articles under /articles/, and everything else hangs off the home page.
+const breadcrumbParent = isClassDetail
+  ? { name: 'หลักสูตร', url: `${productionOrigin}/classes/` }
+  : page.kind === 'article-page'
+    ? { name: 'บทความ', url: `${productionOrigin}/articles/` }
+    : undefined;
+const breadcrumbTrail = [
+  { name: 'หน้าแรก', url: `${productionOrigin}/` },
+  ...(breadcrumbParent ? [breadcrumbParent] : []),
+  { name: cleanPageTitle, url: pageUrl },
+];
+const breadcrumbSchema = {
+  '@type': 'BreadcrumbList',
+  '@id': `${pageUrl}#breadcrumb`,
+  itemListElement: breadcrumbTrail.map((crumb, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: crumb.name,
+    item: crumb.url,
+  })),
+};
+
+const isThankYouPage = page.route === '/tk/';
+const isHomePage = page.route === '/';
+const normalizedJsonLd = isThankYouPage ? [] : [JSON.stringify({
   '@context': 'https://schema.org',
-  '@graph': [organizationSchema, websiteSchema, primarySchema],
+  '@graph': [
+    organizationSchema,
+    // The branch entities are only worth spelling out where they are the subject.
+    ...(isHomePage || page.route === '/contact/' ? branchSchemas : []),
+    websiteSchema,
+    primarySchema,
+    ...(isHomePage ? [] : [breadcrumbSchema]),
+  ],
 })];
-const homepageCopy = new Map([
-  ['Tailored Education for the Digital Age: Preparing Kids for Tomorrow', 'พื้นที่เรียนรู้ที่เด็กได้ทั้งความรู้และความสุข'],
-  ['เรียนรู้ผ่านการเล่นและกิจกรรม', 'สนุกกับการเรียน เข้าใจสิ่งที่ทำ'],
-  ['เราเชื่อว่าการเรียนรู้ที่ดีที่สุดเกิดขึ้นเมื่อเด็กๆ สนุกสนานและมีส่วนร่วม หลักสูตรของเราออกแบบมาเพื่อกระตุ้นความอยากรู้อยากเห็นและความคิดสร้างสรรค์ผ่านกิจกรรมที่หลากหลาย', 'เด็กได้คิด ลงมือทำ และมีส่วนร่วมกับบทเรียน บรรยากาศที่ผ่อนคลายช่วยให้เด็กเปิดใจเรียนรู้ กล้าลอง และเข้าใจสิ่งที่เรียนได้ดีขึ้น'],
-  ['พัฒนาทักษะรอบด้านสำหรับอนาคต', 'เรียนให้เข้าใจ ไม่เร่งและไม่กดดัน'],
-  ['นอกจากความรู้ทางวิชาการ เรามุ่งเน้นการพัฒนาทักษะสำคัญสำหรับศตวรรษที่ 21 เช่น การคิดวิเคราะห์ การทำงานเป็นทีม และความคิดสร้างสรรค์', 'เราให้ความสำคัญกับพื้นฐานและกระบวนการคิด เด็กแต่ละคนจึงมีพื้นที่ค่อยๆ ทำความเข้าใจ ถามในสิ่งที่สงสัย และพัฒนาไปตามจังหวะของตัวเอง'],
-  ['ครูผู้เชี่ยวชาญและหลักสูตรที่ทันสมัย', 'กล้าคิด กล้าถาม และมั่นใจขึ้น'],
-  ['ทีมครูของเราผ่านการฝึกอบรมพิเศษในการสอนแบบ play-based learning และหลักสูตรของเราได้รับการปรับปรุงอย่างสม่ำเสมอเพื่อให้ทันต่อการเปลี่ยนแปลงของโลก', 'ครูเฉพาะด้านคอยชวนคิด รับฟัง และให้คำแนะนำโดยไม่สร้างความกดดัน เด็กจึงกล้าถาม กล้าลอง และค่อยๆ มั่นใจในความสามารถของตัวเอง'],
-  ['Success Stories:', 'เสียงจากผู้ปกครองและนักเรียน'],
-  ['เรื่องราวความสำเร็จจากนักเรียนของเรา', 'ฟังประสบการณ์จริงจากครอบครัวที่เรียนกับ Mind Academy'],
-  ['เราเชื่อว่าการเรียนรู้ควรสนุกและมีความหมาย เราสร้างสภาพแวดล้อมที่ปลอดภัยและสร้างสรรค์ เพื่อให้เด็กๆ ได้พัฒนาทักษะการคิดวิเคราะห์และความมั่นใจในตนเอง ผ่านหลักสูตรที่ออกแบบมาเฉพาะ โดยทีมครูผู้เชี่ยวชาญของเรา', 'เราอยากให้ Mind Academy เป็นพื้นที่ที่เด็กไม่ต้องเลือกระหว่างความสนุกกับความรู้ ทุกคลาสจึงให้เด็กได้คิดและลงมือทำ ในบรรยากาศที่ผ่อนคลายและเป็นมิตร เด็กจะได้พื้นฐานที่นำไปใช้ต่อได้จริง พร้อมความมั่นใจว่าการเรียนรู้ไม่จำเป็นต้องเป็นเรื่องเครียด'],
-]);
-const migratedContent = page.route === '/'
-  ? [...homepageCopy].reduce((content, [from, to]) => content.replace(from, to), page.content)
-  : page.route === '/classes/'
-    ? page.content
-        .replace('<h1>Mind Classes</h1>', '<h1>หลักสูตรของ Mind Academy</h1>')
-        .replace('เราใช้การเรียนรู้ผ่านการเล่นและกิจกรรม ผ่านบทเรียนที่ออกแบบมาอย่างพิถีพิถันเพื่อพัฒนาทักษะการคิดวิเคราะห์และความมั่นใจในตนเอง วิธีการเรียนการสอนของเราเน้นการมีส่วนร่วม ส่งเสริมการเรียนรู้อย่างสนุกสนานและมีประสิทธิภาพ ซึ่งช่วยให้เด็กๆ สามารถนำไปใช้ได้ในชีวิตจริง', 'สำรวจคลาสเรียนที่ช่วยให้เด็กๆ ได้คิด ลงมือทำ และเรียนรู้อย่างสนุกในจังหวะที่เหมาะกับตัวเอง')
-        .replaceAll(' target="_blank" rel="noopener noreferrer"', '')
-  : page.route === '/classes/sam/'
-    ? page.content.replaceAll('Singapore Math™️', 'Singapore Math')
-  : page.route === '/classes/pre-inter/'
-    ? page.content.replace('ติดต่อเราเพื่อขอข้อมูลเพิ่มเติม พร้อมโปรโมชั่นพิเศษ', 'รับข้อมูลเพิ่มเติม พร้อมโปรโมชั่นพิเศษ')
-  : page.route === '/ikigai-for-kids/'
-    ? page.content.replace(
-        '<h1 class="wp-block-heading has-text-align-left">ทำไมต้อง Ikigai ในยุค AI?</h1>',
-        '<h2 class="wp-block-heading has-text-align-left">ทำไมต้อง Ikigai ในยุค AI?</h2>',
-      )
-  : page.content;
+
+const lineIcon = '<svg aria-hidden="true" viewBox="0 0 48 48"><path fill="currentColor" d="M25.12 44.52c-2.11 1.16-2.02-.55-1.93-1.08l.3-1.78c.07-.54.14-1.36-.07-1.89-.23-.58-1.16-.88-1.85-1.03C11.48 37.42 4.01 30.4 4.01 22.03 4.01 12.68 13.43 5.08 25 5.08S46 12.68 46 22.03c0 10.49-11.13 17.13-20.88 22.49ZM18.37 25.85c0-.56-.46-1.02-1.02-1.02h-2.86v-6.68c0-.56-.46-1.01-1.02-1.01-.57 0-1.03.45-1.03 1.01v7.7c0 .56.46 1.01 1.03 1.01h3.88c.56 0 1.02-.45 1.02-1.01Zm2.99-7.7c0-.56-.46-1.01-1.03-1.01-.56 0-1.02.45-1.02 1.01v7.7c0 .56.46 1.01 1.02 1.01.57 0 1.03-.45 1.03-1.01v-7.7Zm9.34 0c0-.56-.46-1.01-1.03-1.01-.56 0-1.02.45-1.02 1.01v4.76l-3.98-5.37a1.03 1.03 0 0 0-1.14-.35c-.42.14-.7.53-.7.96v7.7c0 .56.46 1.01 1.02 1.01.57 0 1.03-.45 1.03-1.01v-4.76l3.98 5.37c.19.25.5.4.82.4.1 0 .21-.01.32-.05.42-.14.7-.52.7-.96v-7.7Zm6.28 2.83h-2.86v-1.81h2.86c.56 0 1.02-.46 1.02-1.02s-.46-1.01-1.02-1.01H33.1c-.57 0-1.03.45-1.03 1.01v7.7c0 .56.46 1.01 1.03 1.01h3.88c.56 0 1.02-.45 1.02-1.01s-.46-1.02-1.02-1.02h-2.86v-1.81h2.86c.56 0 1.02-.46 1.02-1.02s-.46-1.02-1.02-1.02Z"/></svg>';
+
 const embedTitle = (tag: string) => {
   const src = tag.match(/\bsrc=["']([^"']+)/i)?.[1] || '';
   if (src.includes('google.com/maps')) return 'แผนที่ Mind Academy';
@@ -144,7 +184,7 @@ const embedTitle = (tag: string) => {
   if (src.includes('ted.com')) return 'วิดีโอ TED';
   return 'เนื้อหาฝังจากเว็บไซต์ภายนอก';
 };
-const cleanPageTitle = page.title.replace(/\s*[»|].*$/, '').trim();
+
 const escapeAttribute = (value: string) => value
   .replaceAll('&', '&amp;')
   .replaceAll('"', '&quot;')
@@ -153,41 +193,114 @@ const escapeAttribute = (value: string) => value
 const isUnusableAlt = (value: string) => !value.trim()
   || /(?:à¸|à¹|&#\d{2,};)/i.test(value)
   || /^(?:img|image|photo|picture|รูป|ภาพ)$/i.test(value.trim());
+/**
+ * When an image carries no usable alt of its own we fall back to the page title.
+ * That is worth saying once — for the lead image it genuinely describes the
+ * subject — but repeating it down the page just makes a screen reader recite the
+ * same sentence. Later fallbacks become alt="", marking the image decorative.
+ */
+const usedFallbackAlts = new Set<string>();
 const imageAlt = (tag: string) => {
   const current = tag.match(/\balt=["']([^"']*)["']/i)?.[1] || '';
-  if (!isUnusableAlt(current)) return current;
+  if (!isUnusableAlt(current)) {
+    // Remember authored alts too, so a later stand-in never repeats one.
+    usedFallbackAlts.add(current);
+    return current;
+  }
+  // Neither the alt nor the title attribute described this image, so anything we
+  // pick is a stand-in. Use each stand-in once and mark the repeats decorative.
   const title = tag.match(/\btitle=["']([^"']+)["']/i)?.[1] || '';
-  if (!isUnusableAlt(title)) return title;
-  return cleanPageTitle;
+  const fallback = isUnusableAlt(title) ? cleanPageTitle : title;
+  if (usedFallbackAlts.has(fallback)) return '';
+  usedFallbackAlts.add(fallback);
+  return fallback;
 };
-const setImageAlt = (tag: string, alt: string) => {
-  const withoutAlt = tag.replace(/\s+alt=["'][^"']*["']/i, '');
-  return withoutAlt.replace('<img', `<img alt="${escapeAttribute(alt)}"`);
+const setImageAlt = (tag: string, alt: string) => tag
+  .replace(/\s+alt=["'][^"']*["']/i, '')
+  .replace('<img', `<img alt="${escapeAttribute(alt)}"`);
+
+/**
+ * The articles index lays its cards out on a 12-column 1180px grid: the lead
+ * card spans 8 columns (~780px), the rest span 4 (~380px), and both collapse to
+ * 6 columns and then to full width. Those two cases are measured against the
+ * stylesheet, so they can be declared precisely.
+ *
+ * Every other image on the site sits in a layout we have not pinned down, so it
+ * gets a deliberately generous hint: over-fetching one step is invisible, while
+ * under-fetching would visibly soften the picture.
+ */
+const IMAGE_SIZES = {
+  /** Page banners and article headlines run edge to edge. */
+  banner: '100vw',
+  /** Articles index: lead card spans 8 of 12 columns, the rest span 4. */
+  lead: '(max-width: 560px) 92vw, (max-width: 920px) 46vw, 780px',
+  grid: '(max-width: 560px) 92vw, (max-width: 920px) 46vw, 380px',
+  /** Related-post thumbnails: three across 1180px, one across below 820px. */
+  card: '(max-width: 820px) 92vw, 380px',
+  default: '(max-width: 1180px) 100vw, 1180px',
+} as const;
+
+type ImageContext = keyof typeof IMAGE_SIZES;
+
+const withResponsiveSources = (tag: string) => {
+  const context = (tag.match(/\bdata-context=["'](\w+)["']/i)?.[1] ?? 'default') as ImageContext;
+  const stripped = tag.replace(/\sdata-context=["'][^"']*["']/i, '');
+  // WordPress left `sizes` on images it never gave a `srcset`; the browser ignores
+  // those, so drop them rather than shipping the attribute on every page.
+  const withoutOrphanSizes = /\ssrcset\s*=/i.test(stripped)
+    ? stripped
+    : stripped.replace(/\ssizes=["'][^"']*["']/i, '');
+  const src = withoutOrphanSizes.match(/\ssrc=["']([^"']+)["']/i)?.[1];
+  if (!src?.startsWith('/assets/')) return withoutOrphanSizes;
+  const candidates = candidatesFor(src);
+  // Only one size exists on disk, so there is nothing to choose between.
+  if (candidates.length < 2) return withoutOrphanSizes;
+  const srcset = candidates.map((candidate) => `${candidate.url} ${candidate.width}w`).join(', ');
+  // WordPress shipped its own srcset/sizes on featured images. Replace them so every
+  // image on the site derives its candidates from the same on-disk manifest.
+  return withoutOrphanSizes
+    .replace(/\ssrcset=["'][^"']*["']/i, '')
+    .replace(/\ssizes=["'][^"']*["']/i, '')
+    .replace('<img', `<img srcset="${srcset}" sizes="${IMAGE_SIZES[context]}"`);
 };
-const lineIcon = '<svg aria-hidden="true" viewBox="0 0 48 48"><path fill="currentColor" d="M25.12 44.52c-2.11 1.16-2.02-.55-1.93-1.08l.3-1.78c.07-.54.14-1.36-.07-1.89-.23-.58-1.16-.88-1.85-1.03C11.48 37.42 4.01 30.4 4.01 22.03 4.01 12.68 13.43 5.08 25 5.08S46 12.68 46 22.03c0 10.49-11.13 17.13-20.88 22.49ZM18.37 25.85c0-.56-.46-1.02-1.02-1.02h-2.86v-6.68c0-.56-.46-1.01-1.02-1.01-.57 0-1.03.45-1.03 1.01v7.7c0 .56.46 1.01 1.03 1.01h3.88c.56 0 1.02-.45 1.02-1.01Zm2.99-7.7c0-.56-.46-1.01-1.03-1.01-.56 0-1.02.45-1.02 1.01v7.7c0 .56.46 1.01 1.02 1.01.57 0 1.03-.45 1.03-1.01v-7.7Zm9.34 0c0-.56-.46-1.01-1.03-1.01-.56 0-1.02.45-1.02 1.01v4.76l-3.98-5.37a1.03 1.03 0 0 0-1.14-.35c-.42.14-.7.53-.7.96v7.7c0 .56.46 1.01 1.02 1.01.57 0 1.03-.45 1.03-1.01v-4.76l3.98 5.37c.19.25.5.4.82.4.1 0 .21-.01.32-.05.42-.14.7-.52.7-.96v-7.7Zm6.28 2.83h-2.86v-1.81h2.86c.56 0 1.02-.46 1.02-1.02s-.46-1.01-1.02-1.01H33.1c-.57 0-1.03.45-1.03 1.01v7.7c0 .56.46 1.01 1.03 1.01h3.88c.56 0 1.02-.45 1.02-1.01s-.46-1.02-1.02-1.02h-2.86v-1.81h2.86c.56 0 1.02-.46 1.02-1.02s-.46-1.02-1.02-1.02Z"/></svg>';
-let iframeIndex = 0;
+
 const eagerFirstEmbedRoutes = new Set([
   '/classes/sam/', '/classes/eng/', '/classes/coding/', '/classes/thai/',
   '/classes/pre-inter/', '/classes/summer/',
 ]);
-const firstIframeOffset = migratedContent.search(/<iframe\b/i);
-const renderedContent = migratedContent
+
+// Rewrites that only touch URLs and icons run first, so the offsets measured
+// below refer to exactly the string the <img> pass walks.
+const normalizedContent = page.content
   .replace(/(<a\b[^>]*href=["'][^"']*lin\.ee[^"']*["'][^>]*>[\s\S]*?<span class=["']gb-icon["']>)<svg\b[\s\S]*?<\/svg>/gi, `$1${lineIcon}`)
   .replace(/(<a\b[^>]*\btitle=["']Permalink to ([^"']+)["'][^>]*>\s*)(<img\b[^>]*>)/gi, (_match, anchor, linkedTitle, image) => (
     `${anchor}${setImageAlt(image, linkedTitle)}`
   ))
   .replaceAll('https://player-api.gumlet.io/embed/', 'https://play.gumlet.io/embed/')
-  .replace(/https:\/\/mindacademy\.gumlet\.io\/wp-content\/uploads\/2025\/01\/[^"']*Ikigai[^"']*12\.08\.29-PM\.jpg\?compress=true/gi, '/assets/wp-content/uploads/2025/01/ikigai-for-kids-application.jpg')
-  .replace(/https:\/\/mindacademy\.gumlet\.io\/wp-content\/uploads\/2025\/01\/[^"']*Ikigai[^"']*visual-selection-e1737437095302\.png\?compress=true/gi, '/assets/wp-content/uploads/2025/01/ikigai-for-kids-four-pillars.png')
-  .replace(/<iframe\b[^>]*>/gi, (tag) => {
-    const isFirstEmbed = iframeIndex++ === 0 && eagerFirstEmbedRoutes.has(page.route);
-    let clean = tag.replace(/\s(?:width|height)=["']undefined["']/gi, '');
-    if (!/\btitle\s*=/i.test(clean)) clean = clean.replace('<iframe', `<iframe title="${embedTitle(clean)}"`);
-    clean = clean.replace(/\sloading=["'][^"']*["']/i, '');
-    clean = clean.replace('<iframe', `<iframe loading="${isFirstEmbed ? 'eager' : 'lazy'}"`);
-    return clean;
-  })
-  .replace(/<img\b[^>]*>/gi, (tag, offset) => {
+  // Category and tag links left over from WordPress still point at URLs that only
+  // 301 elsewhere. Send them straight to the destination instead.
+  .replace(/(<a\b[^>]*\bhref=")(\/[^"#?]*)("|[#?][^"]*")/gi, (match, head, href, tail) => {
+    const destination = finalDestination(href);
+    return destination === href ? match : `${head}${destination}${tail}`;
+  });
+
+// Label each image with the layout slot it sits in, so the size hint below can
+// match the column span the stylesheet actually gives it.
+let cardIndex = 0;
+const isArticlesIndex = page.route === '/articles/';
+const taggedContent = normalizedContent
+  .replace(/(<div class="page-banner[^"]*">\s*)<img\b/gi, '$1<img data-context="banner"')
+  .replace(/(<div class="entry-pic entry-pic-headline"[^>]*>\s*)<img\b/gi, '$1<img data-context="banner"')
+  .replace(/<div class="entry-pic">[\s\S]*?<\/div>/gi, (block) => block.replace(
+    '<img',
+    `<img data-context="${isArticlesIndex ? (cardIndex++ === 0 ? 'lead' : 'grid') : 'card'}"`,
+  ));
+
+const firstIframeOffset = taggedContent.search(/<iframe\b/i);
+
+let iframeIndex = 0;
+const renderedContent = taggedContent
+  .replace(/<img\b[^>]*>/gi, (tag, offset: number) => {
     let clean = setImageAlt(tag, imageAlt(tag));
     if (!/\bdecoding\s*=/i.test(clean)) clean = clean.replace('<img', '<img decoding="async"');
     if (page.route === '/why-singapore-math/' && clean.includes('cdn-images-1.medium.com') && !/\bwidth\s*=/i.test(clean)) clean = clean.replace('<img', '<img width="941" height="530"');
@@ -199,78 +312,101 @@ const renderedContent = migratedContent
     clean = clean.replace(/\sfetchpriority=["'][^"']*["']/i, '');
     if (isPriorityImage) clean = clean.replace('<img', '<img fetchpriority="high"');
     clean = clean.replace('<img', `<img loading="${isPriorityImage ? 'eager' : 'lazy'}"`);
-    return clean;
+    return withResponsiveSources(clean);
+  })
+  .replace(/<iframe\b[^>]*>/gi, (tag) => {
+    // Native iframe lazy-loading barely defers anything on a fast connection, so
+    // every embed except a page's designated hero is parked behind data-src and
+    // hydrated by the shared observer in SiteLayout.
+    const isFirstEmbed = iframeIndex++ === 0 && eagerFirstEmbedRoutes.has(page.route);
+    let clean = tag.replace(/\s(?:width|height)=["']undefined["']/gi, '');
+    if (!/\btitle\s*=/i.test(clean)) clean = clean.replace('<iframe', `<iframe title="${embedTitle(clean)}"`);
+    clean = clean.replace(/\sloading=["'][^"']*["']/i, '');
+    if (isFirstEmbed) return clean.replace('<iframe', '<iframe loading="eager"');
+    return clean.replace(/\ssrc=(["'])([^"']*)\1/i, ' data-src=$1$2$1').replace('<iframe', '<iframe loading="lazy"');
   })
   .replace(/<a\b([^>]*)>\s*(<img\b[^>]*>)\s*<\/a>/gi, (match, attributes, image) => {
     if (/\baria-label\s*=/i.test(attributes)) return match;
     const label = image.match(/\balt=["']([^"']+)["']/i)?.[1] || `ดูภาพจาก ${cleanPageTitle}`;
     return `<a${attributes} aria-label="${label}">${image}</a>`;
   });
+
 const hasDeftForm = renderedContent.includes('class="deftform"');
+const embedHosts = [...new Set([
+  ...[...renderedContent.matchAll(/\sdata-src=["']https?:\/\/([^/"']+)/gi)].map((match) => `https://${match[1]}`),
+  // The homepage reels below are authored here rather than in the page content.
+  ...(page.route === '/' ? ['https://www.facebook.com'] : []),
+])];
 ---
 <SiteLayout
-  title={page.title}
-  description={page.route === '/tk/' ? 'ขอบคุณที่ติดต่อ Mind Academy ดูข้อมูลสาขาและช่องทางติดต่อเพิ่มเติม' : page.description}
+  title={seoTitle}
+  description={isThankYouPage ? 'ขอบคุณที่ติดต่อ Mind Academy ดูข้อมูลสาขาและช่องทางติดต่อเพิ่มเติม' : page.description}
   canonical={page.canonical}
   bodyClass={page.bodyClass}
-  redirect={page.redirect}
   jsonLd={normalizedJsonLd}
-  indexable={page.route !== '/tk/'}
+  indexable={!isThankYouPage}
+  socialImage={legacyArticleImage}
+  preconnect={embedHosts}
+  articleMeta={page.kind === 'article-page' ? {
+    publishedTime: legacyArticle?.datePublished,
+    modifiedTime: legacyArticle?.dateModified,
+    author: author.name,
+  } : undefined}
 >
-  {page.redirect ? (
-    <section class="redirect-page">
-      <h1>กำลังพาไปยังหน้าที่ต้องการ</h1>
-      <p><a href={page.redirect}>ไปต่อที่ {page.redirect}</a></p>
+  {page.route === '/' && (
+    <section class="ocean-hero" aria-labelledby="ocean-title">
+      <div class="ocean-copy">
+        <h1 id="ocean-title">เรียนสนุก เข้าใจจริง<br />เติบโตอย่างมั่นใจ</h1>
+        <p>พื้นที่ที่เด็กๆ ได้คิดและลงมือทำ เรียนรู้อย่างผ่อนคลาย ได้ทั้งพื้นฐานที่แข็งแรงและความสุข สนุกระหว่างทาง</p>
+        <div class="ocean-actions"><a class="primary-ocean-action" href="/classes/">ดูคลาสเรียนทั้งหมด</a><a class="secondary-ocean-action" href="#classroom-reels">ดูความสนุกในห้องเรียน</a></div>
+      </div>
+      <div class="octopus-navigator">
+        <img
+          data-image-component="true"
+          src="/assets/brand/mind-octopus.webp"
+          srcset="/assets/brand/mind-octopus-512x512.webp 512w, /assets/brand/mind-octopus-768x768.webp 768w, /assets/brand/mind-octopus.webp 1024w"
+          sizes="(max-width: 560px) 74vw, (max-width: 920px) 60vw, 470px"
+          alt="มาสคอทปลาหมึก Mind Academy"
+          width="1024"
+          height="1024"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <a class="course-bubble math" href="/classes/sam/"><strong>Singapore Math</strong><span>จัดกลุ่มตามระดับ</span></a>
+        <a class="course-bubble english" href="/classes/eng/"><strong>English</strong><span>ฟัง พูด อ่าน เขียน</span></a>
+        <a class="course-bubble coding" href="/classes/coding/"><strong>Coding</strong><span>คิดเป็นขั้นตอน</span></a>
+        <a class="course-bubble thai" href="/classes/thai/"><strong>ภาษาไทย</strong><span>อ่านและเขียน</span></a>
+        <a class="course-bubble confidence" href="/classes/"><strong>วิชาเสริมอื่นๆ</strong><span>เรียนอย่างผ่อนคลาย</span></a>
+      </div>
+      <div class="reef-line" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
     </section>
-  ) : (
-    <>
-      {page.route === '/' && (
-        <section class="ocean-hero" aria-labelledby="ocean-title">
-          <div class="ocean-copy">
-            <h1 id="ocean-title">เรียนสนุก เข้าใจจริง<br />เติบโตอย่างมั่นใจ</h1>
-            <p>พื้นที่ที่เด็กๆ ได้คิดและลงมือทำ เรียนรู้อย่างผ่อนคลาย ได้ทั้งพื้นฐานที่แข็งแรงและความสุข สนุกระหว่างทาง</p>
-            <div class="ocean-actions"><a class="primary-ocean-action" href="/classes/">ดูคลาสเรียนทั้งหมด</a><a class="secondary-ocean-action" href="#why-mind">ทำไมต้อง Mind Academy</a></div>
-          </div>
-          <div class="octopus-navigator">
-            <img data-image-component="true" src="/assets/brand/mind-octopus.webp" alt="มาสคอทปลาหมึก Mind Academy" width="1024" height="1024" loading="eager" fetchpriority="high" />
-            <a class="course-bubble math" href="/classes/sam/"><strong>Singapore Math</strong><span>จัดกลุ่มตามระดับ</span></a>
-            <a class="course-bubble english" href="/classes/eng/"><strong>English</strong><span>ฟัง พูด อ่าน เขียน</span></a>
-            <a class="course-bubble coding" href="/classes/coding/"><strong>Coding</strong><span>คิดเป็นขั้นตอน</span></a>
-            <a class="course-bubble thai" href="/classes/thai/"><strong>ภาษาไทย</strong><span>อ่านและเขียน</span></a>
-            <a class="course-bubble confidence" href="/classes/"><strong>วิชาเสริมอื่นๆ</strong><span>เรียนอย่างผ่อนคลาย</span></a>
-          </div>
-          <div class="reef-line" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-        </section>
-      )}
-      {page.route === '/' && <span id="why-mind" class="anchor-target" aria-hidden="true"></span>}
-      <article class:list={['legacy-content', page.kind]} set:html={renderedContent} />
-      {hasDeftForm && <script is:inline src="https://cdn.deftform.com/embed.js"></script>}
-      {page.route === '/' && (
-        <section class="classroom-reels" aria-labelledby="classroom-reels-title">
-          <div class="classroom-reels__inner">
-            <div class="classroom-reels__heading">
-              <h2 id="classroom-reels-title">ตามดูความสนุกในห้องเรียน</h2>
-              <p>ช่วงเวลาจริงจากคลาสที่เด็กๆ ได้คิด ลงมือทำ และเรียนรู้อย่างเป็นธรรมชาติ</p>
-            </div>
-            <div class="classroom-reels__track" aria-label="คลิปบรรยากาศการเรียน เลื่อนซ้ายขวาเพื่อดูเพิ่มเติม">
-              {[
-                '1596914968500637', '1517295700440541', '27940496045566936',
-                '1777094457068710', '1674780813820761', '2066312910624618', '1170410918196200',
-              ].map((id, index) => {
-                const reelUrl = `https://www.facebook.com/reel/${id}/`;
-                const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(reelUrl)}&show_text=false&autoplay=false`;
-                return (
-                  <article class="classroom-reel">
-                    <div class="classroom-reel__frame">
-                      <iframe data-src={embedUrl} title={`บรรยากาศการเรียน Mind Academy คลิปที่ ${index + 1}`} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-    </>
+  )}
+  <article class:list={['legacy-content', page.kind]} set:html={renderedContent} />
+  {hasDeftForm && <script is:inline src="https://cdn.deftform.com/embed.js"></script>}
+  {page.route === '/' && (
+    <section class="classroom-reels" id="classroom-reels" aria-labelledby="classroom-reels-title">
+      <div class="classroom-reels__inner">
+        <div class="classroom-reels__heading">
+          <h2 id="classroom-reels-title">ตามดูความสนุกในห้องเรียน</h2>
+          <p>ช่วงเวลาจริงจากคลาสที่เด็กๆ ได้คิด ลงมือทำ และเรียนรู้อย่างเป็นธรรมชาติ</p>
+        </div>
+        <div class="classroom-reels__track" tabindex="0" role="group" aria-label="คลิปบรรยากาศการเรียน เลื่อนซ้ายขวาเพื่อดูเพิ่มเติม">
+          {[
+            '1596914968500637', '1517295700440541', '27940496045566936',
+            '1777094457068710', '1674780813820761', '2066312910624618', '1170410918196200',
+          ].map((id, index) => {
+            const reelUrl = `https://www.facebook.com/reel/${id}/`;
+            const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(reelUrl)}&show_text=false&autoplay=false`;
+            return (
+              <article class="classroom-reel">
+                <div class="classroom-reel__frame">
+                  <iframe data-src={embedUrl} title={`บรรยากาศการเรียน Mind Academy คลิปที่ ${index + 1}`} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   )}
 </SiteLayout>

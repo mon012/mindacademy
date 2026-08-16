@@ -1,7 +1,7 @@
 {
   "route": "/classes/summer/",
   "title": "Mind Summer Camp » Mind Academy",
-  "description": "{\"@context\":\"https://schema.org\",\"@type\":\"VideoObject\",\"name\":\"mind summer",
+  "description": "Mind Summer Camp ค่ายปิดเทอมสำหรับเด็ก เสริมทักษะวิชาการ ความคิดสร้างสรรค์ และความมั่นใจ ผ่านกิจกรรมที่สนุกและได้ลงมือทำจริง",
   "canonical": "/classes/summer/",
   "bodyClass": "wp-singular page-template-default page page-id-1802 page-child parent-pageid-1542 wp-custom-logo wp-theme-plant3",
   "jsonLd": [

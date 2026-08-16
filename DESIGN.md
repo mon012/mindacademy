@@ -26,13 +26,13 @@ typography:
     fontSize: "clamp(4rem, 6vw, 5.5rem)"
     fontWeight: 400
     lineHeight: 1.02
-    letterSpacing: "normal"
+    letterSpacing: "-0.035em"
   headline:
     fontFamily: "Maledpan, sans-serif"
     fontSize: "clamp(2.65rem, 4vw, 3.5rem)"
     fontWeight: 400
     lineHeight: 1.08
-    letterSpacing: "normal"
+    letterSpacing: "-0.035em"
   body:
     fontFamily: "Maledpan, sans-serif"
     fontSize: "clamp(1.125rem, 1.3vw, 1.22rem)"
@@ -87,7 +87,7 @@ components:
 
 Mind Academy is a spacious, editorial underwater world in which the turquoise octopus acts as a curriculum guide. Peach air and powder-aqua currents hold a set of mint, lavender, coral, and yellow learning islands. The tone is friendly and imaginative without becoming a literal aquarium or a conventional education template.
 
-The approved visual authority is `.impeccable/mocks/pastel-curriculum-navigator.png`. Shipped implementation truth lives in `src/styles/global.css`, `src/pages/[...slug].astro`, and `src/layouts/SiteLayout.astro`; `PRODUCT.md` remains the authority for product claims, routes, copy, and content fidelity.
+Shipped implementation truth lives in `src/styles/global.css`, `src/pages/[...slug].astro`, and `src/layouts/SiteLayout.astro`; `PRODUCT.md` remains the authority for product claims, routes, copy, and content fidelity. The design is settled — treat the rendered pages as the reference and change them only deliberately.
 
 **Key characteristics:**
 
@@ -123,7 +123,7 @@ The palette pairs deep ocean navy with warm peach and white reading surfaces, th
 - **Pale Aqua** (`#e5f8f7`): quiet alternate surface.
 - **Ocean Copy** (`#536883`): supporting copy and captions.
 - **Wave Rule** (`#a7dfe3`): dividers and subtle structural lines.
-- **Link Teal** (`#176f79`): inline links; hover shifts to Deep Coral.
+- **Link Teal** (`#176f79`): inline links; hover shifts to Deep Coral. The privacy policy is the deliberate exception — its links inherit body navy so the legal text reads as one calm block.
 
 **The Pastel Restraint Rule.** Pastels identify paths and shape the current; they do not compete behind dense copy or replace navy as the legibility anchor.
 
@@ -138,7 +138,7 @@ The palette pairs deep ocean navy with warm peach and white reading surfaces, th
 ### Hierarchy
 
 - **Hero Display** (400, `clamp(4rem, 6vw, 5.5rem)`, `1.02`): the home promise, capped near `12ch`; mobile becomes `clamp(2.9rem, 14vw, 4.1rem)`.
-- **Page Display** (700, `clamp(3rem, 6.8vw, 6rem)`, `1.08`): general page and article titles.
+- **Page Display** (400, `clamp(3rem, 6.8vw, 6rem)`, `1.08`): general page and article titles.
 - **Headline** (400, `clamp(2.65rem, 4vw, 3.5rem)`, `1.08`): section hierarchy.
 - **Body** (400, `clamp(1.125rem, 1.3vw, 1.22rem)`, `1.62–1.68`): body copy starts at 18px; long-form content stays within `72ch`.
 - **Label** (400, `1rem`, `1.2`): navigation, controls, and course names.
@@ -183,9 +183,9 @@ Controls use `12px` corners, imported content cards generally use `14px`, course
 
 ### Header and Navigation
 
-- Sticky desktop header: `88px` minimum height, translucent Peach Air at 94%, original 200px-wide logo, three verified destinations, and a navy LINE action.
-- Navigation links are bold navy with a 2px Current Teal underline on hover and `aria-current="page"`.
-- At `820px`, the logo shrinks to 140px, the LINE action to a 40px minimum height, and navigation occupies a second full-width row.
+- Sticky desktop header: `88px` minimum height, translucent Peach Air at 94%, original 200px-wide logo, three verified destinations, and a LINE action in LINE green (`#06c755`) with white text — the one place the palette yields to a platform's own brand colour.
+- Navigation links are navy with a 2px Current Teal underline on hover and `aria-current="page"`.
+- At `820px` the header becomes a single row of logo plus a bordered “เมนู” toggle. Navigation collapses into a dropdown panel anchored under the toggle, and the LINE action detaches into a fixed pill centred at the bottom of the viewport, clear of the home indicator via `env(safe-area-inset-bottom)`. The logo steps down to 148px, then 126px below `560px`.
 
 ### Buttons
 
@@ -211,10 +211,28 @@ Controls use `12px` corners, imported content cards generally use `14px`, course
 - Success Stories use one horizontal native-swipe track with scroll snap; cards remain large enough to read and retain the original YouTube embeds.
 - The Bangna branch video sits in the left half of Mind Mission, paired with the original mission copy and action on the right; the pair stacks media-first below 920px.
 
+### Classroom Reels
+
+- A horizontal scroll-snap track of seven 9:16 Facebook reels, framed in warm white with a 1.5px navy outline and 16px corners.
+- Both this track and Success Stories are keyboard-reachable via `tabindex="0"`, since a scroll region that only responds to a pointer excludes keyboard users.
+- The hero's secondary action, “ดูความสนุกในห้องเรียน”, scrolls here; the section carries `scroll-margin-top: 96px` so the sticky header never covers the heading.
+
+### Deferred Media
+
+Every embed on the site ships without a `src` and loads only as it approaches the viewport. That is a visible design decision, not just a performance one:
+
+- Each frame reserves its final aspect ratio up front, so nothing reflows when the embed arrives.
+- Reel frames show “กำลังโหลดคลิป” on Powder Aqua until the iframe paints, so an empty box never reads as broken.
+- Embeds therefore require JavaScript. Text content never does.
+
 ### Footer
 
 - Deep Ocean full-width anchor with an organic top seam, inverted original logo, three content/privacy routes, and verified Facebook, LINE, and YouTube links.
 - Desktop uses three columns (`1.4fr 1fr 1fr`); it collapses to one column at `820px`.
+
+## Accepted Deviations
+
+- **Privacy policy and thank-you pages skip from `h1` to `h3`.** The imported WordPress markup starts its sections at `h3`, so the outline has a gap. Promoting those headings to `h2` would be semantically tidier, but `.page-id-1242` sizes `h2` at `clamp(2rem, 3.5vw, 2.75rem)` against `h3` at `clamp(1.6rem, 2.5vw, 2.05rem)` — the headings would visibly grow. The typographic result was judged more important than the outline, and the gap is deliberate. Leave it.
 
 ## Do's and Don'ts
 
@@ -232,3 +250,5 @@ Controls use `12px` corners, imported content cards generally use `14px`, course
 - **Don't** reintroduce the hidden observation-table hero, specimen labels, eyebrow headings, Fjalla One, or Chonburi styling.
 - **Don't** use generic SaaS grids, glassmorphism, hard offset shadows, grain, decorative gradients, or literal photorealistic aquarium scenery.
 - **Don't** convert controls and cards into indiscriminate pills or place busy reef decoration behind reading content.
+- **Don't** give an embed a real `src` in markup, or let a media frame collapse before its content loads.
+- **Don't** add a colour by writing a literal into a rule. Every colour above is a token; a value that appears nowhere in this file is a mistake waiting to be inherited.
