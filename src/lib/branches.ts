@@ -8,6 +8,8 @@
  */
 export interface Branch {
   name: string;
+  /** Anchor id of this branch's block on /contact/, which acts as its location page. */
+  anchor: string;
   streetAddress: string;
   addressLocality: string;
   addressRegion: string;
@@ -19,6 +21,7 @@ export interface Branch {
 export const branches: Branch[] = [
   {
     name: 'Mind Academy สาขาบางนา',
+    anchor: 'branch-bangna',
     streetAddress: '289 ต.บางแก้ว อ.บางพลี',
     addressLocality: 'บางพลี',
     addressRegion: 'สมุทรปราการ',
@@ -28,6 +31,7 @@ export const branches: Branch[] = [
   },
   {
     name: 'Mind Academy สาขาเดอะคริสตัล รามอินทรา',
+    anchor: 'branch-crystal-ramintra',
     streetAddress: 'The Crystal Park เลียบด่วนเอกมัย-รามอินทรา ถนนประดิษฐ์มนูธรรม',
     addressLocality: 'ลาดพร้าว',
     addressRegion: 'กรุงเทพมหานคร',
@@ -37,6 +41,7 @@ export const branches: Branch[] = [
   },
   {
     name: 'Mind Academy สาขาเดอะคริสตัล ราชพฤกษ์',
+    anchor: 'branch-crystal-ratchaphruek',
     streetAddress: 'เดอะคริสตัล ราชพฤกษ์ ชั้น 3',
     addressLocality: 'นนทบุรี',
     addressRegion: 'นนทบุรี',
@@ -45,7 +50,8 @@ export const branches: Branch[] = [
     longitude: 100.372166,
   },
   {
-    name: 'Mind Academy สาขาโรบินสันราชพฤกษ์',
+    name: 'Mind Academy สาขาโรบินสัน ราชพฤกษ์',
+    anchor: 'branch-robinson-ratchaphruek',
     streetAddress: 'ตำบลคลองข่อย ปากเกร็ด',
     addressLocality: 'ปากเกร็ด',
     addressRegion: 'นนทบุรี',

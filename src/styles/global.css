@@ -111,6 +111,28 @@ p, li { font-size: var(--type-body); text-wrap: pretty; }
 .home .gb-container-1ec3fc59 h2 { margin-top: 0; color: var(--navy); }
 .home .gb-container-1ec3fc59 .gb-button { background: var(--navy); color: white; }
 
+/* Home entity intro: states plainly who Mind Academy is and where it teaches.
+   The courses themselves are already linked from the hero bubbles, so this block
+   carries the one thing the hero does not — the branches. */
+.home .page-content > .home-intro { padding: var(--space-section) max(24px, calc((100vw - 1180px) / 2)); background: var(--paper); }
+.home-intro-inner { width: min(1080px, 100%); margin-inline: auto; text-align: center; }
+.home-intro-lead { max-width: 68ch; margin: 0 auto; color: var(--navy); font-size: clamp(1.12rem, 1.55vw, 1.32rem); line-height: 1.72; }
+.home-intro-heading { margin: var(--space-heading) 0 0; color: var(--navy); font-size: clamp(1.6rem, 2.6vw, 2.2rem); }
+.home-intro-branches { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin: 24px 0 0; padding: 0; list-style: none; }
+.home-intro-branches a { display: flex; align-items: center; gap: 14px; min-height: 48px; padding: 14px 16px; border: 2px solid var(--navy); border-radius: 12px; background: var(--white); color: var(--navy); font-weight: 700; text-align: left; text-decoration: none; box-shadow: var(--shadow-label); transition: background-color .2s ease, transform .2s ease; }
+.home-intro-branches .branch-icon { flex: 0 0 auto; width: 50px; height: 50px; display: grid; place-items: center; border: 2px solid var(--navy); border-radius: 50%; }
+.home-intro-branches .branch-icon svg { width: 27px; height: 27px; }
+/* One pastel per branch, cycling the same palette the contact page uses. */
+.home-intro-branches li:nth-child(4n+1) .branch-icon { background: var(--leaf); }
+.home-intro-branches li:nth-child(4n+2) .branch-icon { background: var(--lavender); }
+.home-intro-branches li:nth-child(4n+3) .branch-icon { background: var(--peach); }
+.home-intro-branches li:nth-child(4n) .branch-icon { background: var(--aqua); }
+.home-intro-branches a:hover { background: var(--paper-2); color: var(--navy); transform: translateY(-2px); }
+.home-intro-branches a:hover .branch-icon { transform: rotate(-6deg); }
+.home-intro-branches .branch-icon { transition: transform .25s cubic-bezier(.22, 1, .36, 1); }
+.home-intro-branches .branch-text { min-width: 0; }
+.home-intro-branches .branch-text > span { display: block; margin-top: 4px; color: var(--muted); font-size: .9rem; font-weight: 400; }
+
 /* Shared page exhibit */
 .page-banner { position: relative; width: 100%; height: clamp(380px, 54vw, 680px); overflow: hidden; border-bottom: 14px solid var(--navy); background: var(--navy); }
 .page-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgb(9 41 59 / 92%) 0%, rgb(9 41 59 / 5%) 65%); }
@@ -222,6 +244,17 @@ p, li { font-size: var(--type-body); text-wrap: pretty; }
 .page-id-354 .gb-button[href*='lin.ee'] { border-color: #06c755; background: #06c755; color: white; }
 .page-id-354 .gb-button[href*='facebook.com'] { border-color: #1877f2; background: #1877f2; color: white; }
 .page-id-354 .gb-icon svg { width: 1em; height: 1em; }
+
+/* Branch anchors: the contact page is the location page, so each branch is
+   addressable on its own and the sticky header never covers the heading. */
+.page-id-354 .branch-jump { width: min(1080px, calc(100% - 48px)); margin: 0 auto clamp(40px, 5vw, 64px); padding: clamp(28px, 4vw, 44px); border-radius: 16px; background: var(--white); box-shadow: var(--shadow-label); text-align: center; }
+.page-id-354 .branch-jump h2 { margin: 0; color: var(--navy); font-size: clamp(2rem, 3.6vw, 3rem); }
+.page-id-354 .branch-jump > p { max-width: 52ch; margin: 12px auto 0; color: var(--muted); }
+.page-id-354 .branch-jump ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: clamp(24px, 3vw, 34px) 0 0; padding: 0; list-style: none; }
+.page-id-354 .branch-jump a { display: block; min-height: 48px; padding: 14px 16px; border: 2px solid var(--navy); border-radius: 12px; background: var(--leaf); color: var(--navy); font-weight: 700; text-decoration: none; }
+.page-id-354 .branch-jump a:hover { background: var(--orange); }
+.page-id-354 .branch-jump a span { display: block; margin-top: 4px; color: var(--muted); font-size: .88rem; font-weight: 400; }
+.page-id-354 .gb-container-9d822bfd > .gb-container[id] { scroll-margin-top: 100px; }
 
 /* Thank-you branch directory — visually aligned with Contact, intentionally noindex */
 .page-id-2091 .page-header,
@@ -478,6 +511,15 @@ a:hover { color: var(--orange-dark); }
 .classroom-reel__frame { position: relative; aspect-ratio: 9 / 16; overflow: hidden; border: 1.5px solid var(--navy); border-radius: 16px; background: var(--aqua); box-shadow: 0 14px 30px rgb(16 42 82 / 10%); }
 .classroom-reel__frame::before { content: 'กำลังโหลดคลิป'; position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
 .classroom-reel iframe { position: relative; z-index: 1; width: 100%; height: 100%; background: var(--white); }
+/* The same strip, sitting inside a page's reading column rather than as its own
+   full-bleed band: no decorative orbit, and padding that matches the sections
+   around it instead of the space between page bands. */
+.classroom-reels--inline { padding: clamp(34px, 5vw, 56px) 0 clamp(20px, 3vw, 32px); background: transparent; }
+.classroom-reels--inline::before { content: none; }
+.classroom-reels--inline .classroom-reels__inner { width: 100%; }
+.classroom-reels--inline .classroom-reels__heading { margin-bottom: clamp(22px, 3vw, 32px); }
+.classroom-reels--inline .classroom-reels__heading h2 { font-size: clamp(1.9rem, 3.2vw, 2.6rem); }
+.classroom-reels--inline .classroom-reels__track { grid-auto-columns: minmax(210px, 30%); }
 .home .gb-container-713045d0 { position: relative; background: var(--paper); }
 .home .gb-container-713045d0 h3, .home .gb-container-713045d0 > .gb-container > p { color: #8a59a8; text-align: center; }
 .home .gb-container-713045d0 h3 { margin: 0; font-size: var(--type-section); line-height: 1.08; }
@@ -545,6 +587,30 @@ a:hover { color: var(--orange-dark); }
 .parent-pageid-1542 .page-content > .gb-container:nth-child(2) > .gb-container:last-child { padding: clamp(28px, 5vw, 52px); border: 2px solid #46c4c4; border-radius: 16px; background: var(--white); }
 .parent-pageid-1542 .page-content > .gb-container:nth-child(2) > .gb-container:last-child > h2 { margin: 0 0 24px; }
 .parent-pageid-1542 .gb-button { font-size: 18px; }
+/* WordPress spacer divs carry no height of their own, so two stacked cards ran
+   together with no gap between them. */
+.parent-pageid-1542 ._space { height: clamp(32px, 4vw, 54px); }
+
+/* Page FAQ — answers sit in the open <details> body so they stay copyable and
+   crawlable; only the disclosure state is interactive. */
+.page-faq { padding: clamp(60px, 8vw, 104px) max(24px, calc((100vw - 1180px) / 2)); background: var(--paper-2); }
+.page-faq__inner { width: min(860px, 100%); margin-inline: auto; }
+.page-faq h2 { margin: 0 0 clamp(28px, 4vw, 44px); color: var(--navy); font-size: clamp(2.2rem, 4vw, 3.2rem); text-align: center; }
+.page-faq__item { margin-bottom: 14px; border: 2px solid var(--navy); border-radius: 14px; background: var(--white); box-shadow: var(--shadow-label); }
+.page-faq__item summary { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 22px; color: var(--navy); cursor: pointer; font-family: 'Maledpan', sans-serif; font-size: clamp(1.1rem, 1.6vw, 1.28rem); line-height: 1.4; list-style: none; }
+.page-faq__item summary::-webkit-details-marker { display: none; }
+.page-faq__item summary::after { content: '+'; flex: 0 0 auto; font-size: 1.6rem; line-height: 1; }
+.page-faq__item[open] summary::after { content: '−'; }
+.page-faq__item[open] summary { border-bottom: 2px dashed var(--rule); }
+.page-faq__item p { margin: 0; padding: 18px 22px 22px; line-height: 1.72; }
+
+/* Every article hands the reader on to the class it is really about, so the
+   class pages stop being internal-link dead ends. */
+.related-class { padding: clamp(56px, 7vw, 92px) max(24px, calc((100vw - 1180px) / 2)); background: var(--paper-2); }
+.related-class__inner { width: min(820px, 100%); margin-inline: auto; padding: clamp(28px, 4vw, 46px); border: 2px solid var(--navy); border-radius: 16px; background: var(--white); box-shadow: var(--shadow-label); text-align: center; }
+.related-class__eyebrow { margin: 0; color: var(--muted); font-size: .8rem; letter-spacing: .15em; text-transform: uppercase; }
+.related-class h2 { margin: 10px 0 0; color: var(--navy); font-size: clamp(1.9rem, 3.4vw, 2.7rem); }
+.related-class__blurb { max-width: 56ch; margin: 14px auto 26px; line-height: 1.7; }
 
 /* Pre-Inter: editorial flow with centered introduction and left-aligned content. */
 .page-id-1787 .page-header:not(:has(.page-banner)) { padding-top: clamp(44px, 6vw, 68px); }
@@ -810,6 +876,7 @@ a:hover { color: var(--orange-dark); }
   .octopus-navigator { min-height: 560px; }
   .home .gb-container-713045d0 .success-stories-track { grid-auto-columns: minmax(300px, 78%); }
   .classroom-reels__track { grid-auto-columns: minmax(230px, 44%); }
+  .classroom-reels--inline .classroom-reels__track { grid-auto-columns: minmax(220px, 44%); }
   .home .gb-container-1ec3fc59 .gb-grid-wrapper { grid-template-columns: 1fr; }
   .home .gb-container-1ec3fc59 .mission-media, .home .gb-container-1ec3fc59 .mission-copy { grid-column: 1; }
   .parent-pageid-1542 .page-content > .gb-container:nth-child(2) .gb-grid-wrapper { grid-template-columns: 1fr; }
@@ -917,6 +984,7 @@ a:hover { color: var(--orange-dark); }
   .classroom-reels { padding-block: 78px 72px; }
   .classroom-reels__inner { width: calc(100% - 28px); }
   .classroom-reels__track { grid-auto-columns: 84%; gap: 16px; }
+  .classroom-reels--inline .classroom-reels__track { grid-auto-columns: 84%; }
   .parent-pageid-1542 .page-content > .gb-container { width: calc(100% - 28px); }
   .parent-pageid-1542 .page-content > .gb-container:first-child { width: calc(100% - 28px); }
   .parent-pageid-1542 .page-content > .gb-container:nth-child(2) .gb-grid-wrapper { padding: 18px; }

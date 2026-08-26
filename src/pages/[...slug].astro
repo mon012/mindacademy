@@ -3,6 +3,9 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { assetExists, candidatesFor, finalDestination } from '../lib/images';
 import { branches } from '../lib/branches';
+import { faqsByRoute } from '../lib/faqs';
+import { relatedClassByRoute } from '../lib/related-classes';
+import { reelStripHtml, reelsByRoute } from '../lib/reels';
 
 type Page = CollectionEntry<'pages'>['data'];
 
@@ -53,7 +56,8 @@ const branchSchemas = branches.map((branch, index) => ({
   '@id': `${productionOrigin}/#branch-${index + 1}`,
   name: branch.name,
   parentOrganization: { '@id': organizationId },
-  url: contactUrl,
+  // Each branch is addressable on the contact page, which is its location page.
+  url: `${contactUrl}#${branch.anchor}`,
   telephone: branch.telephone,
   image: absoluteUrl('/assets/wp-content/uploads/2024/09/MA320.webp'),
   address: {
@@ -75,12 +79,16 @@ const organizationSchema = {
   name: 'Mind Academy',
   url: `${productionOrigin}/`,
   logo: absoluteUrl('/assets/wp-content/uploads/2024/09/MA320.webp'),
+  description: 'ศูนย์การเรียนรู้สำหรับเด็กอายุ 4-12 ปี หลักสูตรหลักที่เปิดสอนคือ Singapore Math (S.A.M) หลักสูตรลิขสิทธิ์จากสิงคโปร์ พร้อมคลาสภาษาไทยสำหรับเด็กนักเรียนอินเตอร์ ภาษาอังกฤษ Coding และ AI เปิดสอนที่ 4 สาขาในกรุงเทพฯ และปริมณฑล',
   telephone: branches[0].telephone,
+  email: 'mindschool.2018@gmail.com',
   areaServed: ['กรุงเทพมหานคร', 'นนทบุรี', 'สมุทรปราการ'],
   department: branchSchemas.map((branch) => ({ '@id': branch['@id'] })),
   sameAs: [
     'https://www.facebook.com/mindacademythai',
     'https://www.youtube.com/@mindacademy9724',
+    // LINE is the primary contact channel on every page, so it belongs here too.
+    'https://lin.ee/9AYoGQF',
   ],
 };
 const author = { '@type': 'Person', name: 'PK' };
@@ -119,12 +127,20 @@ const primarySchema = page.kind === 'article-page'
     }
   : isClassDetail
     ? {
-        '@type': 'Service',
-        '@id': `${pageUrl}#service`,
+        '@type': ['Course', 'Service'],
+        '@id': `${pageUrl}#course`,
         name: cleanPageTitle,
         description: page.description,
         url: pageUrl,
         provider: { '@id': organizationId },
+        inLanguage: 'th-TH',
+        // Every class is taught in person at all four branches; nothing beyond
+        // that (schedule, fees) is public, so nothing beyond that is claimed.
+        hasCourseInstance: branchSchemas.map((branch) => ({
+          '@type': 'CourseInstance',
+          courseMode: 'onsite',
+          location: { '@id': branch['@id'] },
+        })),
       }
     : {
         '@type': isCollection ? 'CollectionPage' : page.route === '/contact/' ? 'ContactPage' : 'WebPage',
@@ -159,16 +175,30 @@ const breadcrumbSchema = {
   })),
 };
 
+const faqs = faqsByRoute[page.route] ?? [];
+const relatedClass = relatedClassByRoute[page.route];
+const faqSchema = faqs.length ? {
+  '@type': 'FAQPage',
+  '@id': `${pageUrl}#faq`,
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+} : undefined;
+
 const isThankYouPage = page.route === '/tk/';
 const isHomePage = page.route === '/';
 const normalizedJsonLd = isThankYouPage ? [] : [JSON.stringify({
   '@context': 'https://schema.org',
   '@graph': [
     organizationSchema,
-    // The branch entities are only worth spelling out where they are the subject.
-    ...(isHomePage || page.route === '/contact/' ? branchSchemas : []),
+    // The branch entities are spelled out where they are the subject, and on class
+    // pages, whose hasCourseInstance nodes point at them by @id.
+    ...(isHomePage || isClassDetail || page.route === '/contact/' ? branchSchemas : []),
     websiteSchema,
     primarySchema,
+    ...(faqSchema ? [faqSchema] : []),
     ...(isHomePage ? [] : [breadcrumbSchema]),
   ],
 })];
@@ -320,6 +350,21 @@ const renderedContent = taggedContent
     // hydrated by the shared observer in SiteLayout.
     const isFirstEmbed = iframeIndex++ === 0 && eagerFirstEmbedRoutes.has(page.route);
     let clean = tag.replace(/\s(?:width|height)=["']undefined["']/gi, '');
+    // Facebook's video plugin lays its player out to the width it is handed, while
+    // the tag WordPress wrote pins a fixed pixel height. At full column width the
+    // player outgrew that box and was cropped, so carry the tag's own ratio and let
+    // the height follow — every embed keeps its real shape, portrait ones included.
+    if (/facebook\.com\/plugins/i.test(clean)) {
+      const embedWidth = Number(clean.match(/\swidth=["'](\d+)["']/i)?.[1]);
+      const embedHeight = Number(clean.match(/\sheight=["'](\d+)["']/i)?.[1]);
+      if (embedWidth > 0 && embedHeight > 0) {
+        const ratio = `aspect-ratio:${embedWidth}/${embedHeight};height:auto;`;
+        clean = clean.replace(/\sheight=["']\d+["']/i, '');
+        clean = /\sstyle=["']/i.test(clean)
+          ? clean.replace(/(\sstyle=["'])/i, `$1${ratio}`)
+          : clean.replace('<iframe', `<iframe style="${ratio}"`);
+      }
+    }
     if (!/\btitle\s*=/i.test(clean)) clean = clean.replace('<iframe', `<iframe title="${embedTitle(clean)}"`);
     clean = clean.replace(/\sloading=["'][^"']*["']/i, '');
     if (isFirstEmbed) return clean.replace('<iframe', '<iframe loading="eager"');
@@ -332,8 +377,14 @@ const renderedContent = taggedContent
   });
 
 const hasDeftForm = renderedContent.includes('class="deftform"');
+const reelStrip = reelsByRoute[page.route];
+const REELS_MARKER = '<div data-reels></div>';
+const contentWithReels = reelStrip && renderedContent.includes(REELS_MARKER)
+  ? renderedContent.replace(REELS_MARKER, reelStripHtml(reelStrip, { inline: true }))
+  : renderedContent.replace(REELS_MARKER, '');
+
 const embedHosts = [...new Set([
-  ...[...renderedContent.matchAll(/\sdata-src=["']https?:\/\/([^/"']+)/gi)].map((match) => `https://${match[1]}`),
+  ...[...contentWithReels.matchAll(/\sdata-src=["']https?:\/\/([^/"']+)/gi)].map((match) => `https://${match[1]}`),
   // The homepage reels below are authored here rather than in the page content.
   ...(page.route === '/' ? ['https://www.facebook.com'] : []),
 ])];
@@ -356,9 +407,9 @@ const embedHosts = [...new Set([
   {page.route === '/' && (
     <section class="ocean-hero" aria-labelledby="ocean-title">
       <div class="ocean-copy">
-        <h1 id="ocean-title">เรียนสนุก เข้าใจจริง<br />เติบโตอย่างมั่นใจ</h1>
-        <p>พื้นที่ที่เด็กๆ ได้คิดและลงมือทำ เรียนรู้อย่างผ่อนคลาย ได้ทั้งพื้นฐานที่แข็งแรงและความสุข สนุกระหว่างทาง</p>
-        <div class="ocean-actions"><a class="primary-ocean-action" href="/classes/">ดูคลาสเรียนทั้งหมด</a><a class="secondary-ocean-action" href="#classroom-reels">ดูความสนุกในห้องเรียน</a></div>
+        <h1 id="ocean-title">Mind Academy<br />เรียนสนุก เข้าใจจริง<br />เติบโตอย่างมั่นใจ</h1>
+        <p>ศูนย์การเรียนรู้สำหรับเด็ก 4-12 ปี หลักสูตรหลักที่เปิดสอนคือ Singapore Math (S.A.M) พร้อมคลาสภาษาไทยสำหรับเด็กอินเตอร์ ภาษาอังกฤษ และ Coding &amp; AI ที่ 4 สาขาในกรุงเทพฯ และปริมณฑล</p>
+        <div class="ocean-actions"><a class="primary-ocean-action" href="/classes/sam/">ดูหลักสูตร Singapore Math</a><a class="secondary-ocean-action" href="/classes/">ดูคลาสเรียนทั้งหมด</a></div>
       </div>
       <div class="octopus-navigator">
         <img
@@ -381,32 +432,30 @@ const embedHosts = [...new Set([
       <div class="reef-line" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
     </section>
   )}
-  <article class:list={['legacy-content', page.kind]} set:html={renderedContent} />
-  {hasDeftForm && <script is:inline src="https://cdn.deftform.com/embed.js"></script>}
-  {page.route === '/' && (
-    <section class="classroom-reels" id="classroom-reels" aria-labelledby="classroom-reels-title">
-      <div class="classroom-reels__inner">
-        <div class="classroom-reels__heading">
-          <h2 id="classroom-reels-title">ตามดูความสนุกในห้องเรียน</h2>
-          <p>ช่วงเวลาจริงจากคลาสที่เด็กๆ ได้คิด ลงมือทำ และเรียนรู้อย่างเป็นธรรมชาติ</p>
-        </div>
-        <div class="classroom-reels__track" tabindex="0" role="group" aria-label="คลิปบรรยากาศการเรียน เลื่อนซ้ายขวาเพื่อดูเพิ่มเติม">
-          {[
-            '1596914968500637', '1517295700440541', '27940496045566936',
-            '1777094457068710', '1674780813820761', '2066312910624618', '1170410918196200',
-          ].map((id, index) => {
-            const reelUrl = `https://www.facebook.com/reel/${id}/`;
-            const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(reelUrl)}&show_text=false&autoplay=false`;
-            return (
-              <article class="classroom-reel">
-                <div class="classroom-reel__frame">
-                  <iframe data-src={embedUrl} title={`บรรยากาศการเรียน Mind Academy คลิปที่ ${index + 1}`} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+  <article class:list={['legacy-content', page.kind]} set:html={contentWithReels} />
+  {relatedClass && (
+    <aside class="related-class" aria-labelledby="related-class-title">
+      <div class="related-class__inner">
+        <p class="related-class__eyebrow">คลาสที่เกี่ยวข้อง</p>
+        <h2 id="related-class-title">{relatedClass.title}</h2>
+        <p class="related-class__blurb">{relatedClass.blurb}</p>
+        <a class="gb-button" href={relatedClass.href}>ดูรายละเอียดคลาส</a>
+      </div>
+    </aside>
+  )}
+  {faqs.length > 0 && (
+    <section class="page-faq" aria-labelledby="page-faq-title">
+      <div class="page-faq__inner">
+        <h2 id="page-faq-title">คำถามที่พบบ่อย</h2>
+        {faqs.map((faq) => (
+          <details class="page-faq__item">
+            <summary>{faq.question}</summary>
+            <p set:html={faq.answer} />
+          </details>
+        ))}
       </div>
     </section>
   )}
+  {hasDeftForm && <script is:inline src="https://cdn.deftform.com/embed.js"></script>}
+  {page.route === '/' && reelStrip && <Fragment set:html={reelStripHtml(reelStrip)} />}
 </SiteLayout>
