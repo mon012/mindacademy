@@ -16,8 +16,10 @@ export const reelsByRoute: Record<string, ReelStrip> = {
   '/': {
     title: 'ตามดูความสนุกในห้องเรียน',
     blurb: 'ช่วงเวลาจริงจากคลาสที่เด็กๆ ได้คิด ลงมือทำ และเรียนรู้อย่างเป็นธรรมชาติ',
+    // Reel 1517295700440541 is deliberately not listed: Facebook renders an
+    // Unavailable card for it. Re-add it once the reel is public and embeddable.
     ids: [
-      '1596914968500637', '1517295700440541', '27940496045566936',
+      '1596914968500637', '27940496045566936',
       '1777094457068710', '1674780813820761', '2066312910624618', '1170410918196200',
     ],
   },
