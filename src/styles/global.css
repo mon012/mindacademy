@@ -213,7 +213,6 @@ p, li { font-size: var(--type-body); text-wrap: pretty; }
 .page-id-354 .page-banner { width: 100vw; max-width: none; margin-inline: calc(50% - 50vw); }
 .page-id-354 .page-banner { height: clamp(340px, 42vw, 540px); }
 .page-id-354 .page-header + .page-content { padding: clamp(54px, 7vw, 88px) 0 clamp(90px, 10vw, 136px); }
-.page-id-354 .page-content > iframe:first-child { width: min(1180px, calc(100% - 48px)); height: clamp(380px, 42vw, 520px); margin: 0 auto; border-radius: 16px; box-shadow: var(--shadow-label); }
 .page-id-354 .page-content > .gb-container { width: min(1080px, calc(100% - 48px)); }
 .page-id-354 .gb-container-42aea6fd { margin-top: clamp(52px, 7vw, 84px); padding: clamp(32px, 5vw, 54px); border-radius: 16px; background: var(--leaf); text-align: center; }
 .page-id-354 .gb-container-42aea6fd h2 { max-width: 24ch; margin: 0 auto; color: var(--navy); font-size: clamp(2.2rem, 4vw, 3.4rem); line-height: 1.12; }
@@ -251,7 +250,7 @@ p, li { font-size: var(--type-body); text-wrap: pretty; }
 .page-id-354 .branch-jump { width: min(1080px, calc(100% - 48px)); margin: 0 auto clamp(40px, 5vw, 64px); padding: clamp(28px, 4vw, 44px); border-radius: 16px; background: var(--white); box-shadow: var(--shadow-label); text-align: center; }
 .page-id-354 .branch-jump h2 { margin: 0; color: var(--navy); font-size: clamp(2rem, 3.6vw, 3rem); }
 .page-id-354 .branch-jump > p { max-width: 52ch; margin: 12px auto 0; color: var(--muted); }
-.page-id-354 .branch-jump ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: clamp(24px, 3vw, 34px) 0 0; padding: 0; list-style: none; }
+.page-id-354 .branch-jump ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin: clamp(24px, 3vw, 34px) 0 0; padding: 0; list-style: none; }
 .page-id-354 .branch-jump a { display: block; min-height: 48px; padding: 14px 16px; border: 2px solid var(--navy); border-radius: 12px; background: var(--leaf); color: var(--navy); font-weight: 700; text-decoration: none; }
 .page-id-354 .branch-jump a:hover { background: var(--orange); }
 .page-id-354 .branch-jump a span { display: block; margin-top: 4px; color: var(--muted); font-size: .88rem; font-weight: 400; }
