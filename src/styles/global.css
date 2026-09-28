@@ -1099,3 +1099,7 @@ a:hover { color: var(--orange-dark); }
 .page-content .sam-extra .sam-branches a:hover, .page-content .sam-extra .sam-branches a:focus-visible { background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 85%) 0 9%, transparent 10%), var(--orange); transform: scale(1.06); }
 .page-content .sam-extra .sam-branches span { color: var(--navy); opacity: .7; font-size: .85rem; }
 @media (prefers-reduced-motion: reduce) { .page-content .sam-extra .sam-branches li { animation: none; } }
+.sam-extra h2#sam-branches { margin-top: clamp(64px, 8vw, 104px); margin-bottom: clamp(32px, 4vw, 52px); }
+.page-content .sam-extra ul.sam-branches { gap: clamp(18px, 3vw, 40px); padding-bottom: clamp(16px, 2vw, 24px); }
+.page-content .sam-extra .sam-branches a { width: clamp(128px, 13vw, 156px); }
+.sam-extra .sam-branches__more { margin-top: clamp(36px, 4.5vw, 56px); }
