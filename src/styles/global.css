@@ -1080,3 +1080,10 @@ a:hover { color: var(--orange-dark); }
 .page-content .sam-intro .sam-benefits li, .page-content .sam-intro .sam-intro__cpa li { margin: 0; }
 .page-content .sam-intro li::before, .page-content .sam-intro li::marker { content: none; }
 @media (max-width: 480px) { .sam-benefits li { flex-direction: row; align-items: center; padding: 14px 16px; } .sam-benefit__icon { flex: 0 0 auto; } }
+/* CPA steps as sea bubbles, same treatment as the contact-page branch picker. */
+.page-content .sam-intro .sam-intro__cpa { justify-content: center; gap: clamp(8px, 1.6vw, 18px); }
+.page-content .sam-intro .sam-intro__cpa li { --bubble: var(--lavender); flex: 0 1 108px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; border: 2px solid var(--navy); border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 85%) 0 9%, transparent 10%), radial-gradient(circle at 70% 78%, rgb(255 255 255 / 40%) 0 5%, transparent 6%), radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--bubble) 55%, white), var(--bubble) 70%); box-shadow: inset -6px -8px 14px rgb(9 41 59 / 10%), 0 8px 18px rgb(9 41 59 / 12%); animation: bubble-float 5s ease-in-out infinite; }
+.page-content .sam-intro .sam-intro__cpa li:nth-child(2) { --bubble: var(--peach); margin-top: 14px; animation-delay: -1.6s; }
+.page-content .sam-intro .sam-intro__cpa li:nth-child(3) { --bubble: var(--aqua); animation-delay: -3.2s; }
+.sam-intro__cpa span { color: var(--navy); opacity: .7; }
+@media (prefers-reduced-motion: reduce) { .page-content .sam-intro .sam-intro__cpa li { animation: none; } }
