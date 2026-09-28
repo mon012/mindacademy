@@ -17,10 +17,10 @@ export interface Branch {
   latitude: number;
   longitude: number;
   /**
-   * False until the branch's class list is confirmed; class pages only list
-   * branches known to teach every class as course locations.
+   * Routes of the classes this branch teaches. Omitted for branches that
+   * teach every class.
    */
-  teachesAllClasses?: boolean;
+  classes?: string[];
 }
 
 export const branches: Branch[] = [
@@ -74,6 +74,6 @@ export const branches: Branch[] = [
     telephone: '+66659528883',
     latitude: 13.656802,
     longitude: 100.667153,
-    teachesAllClasses: false,
+    classes: ['/classes/sam/', '/classes/thai/'],
   },
 ];

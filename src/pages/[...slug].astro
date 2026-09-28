@@ -134,9 +134,9 @@ const primarySchema = page.kind === 'article-page'
         url: pageUrl,
         provider: { '@id': organizationId },
         inLanguage: 'th-TH',
-        // Every class is taught in person at each established branch; nothing
+        // Each class is taught in person at the branches that offer it; nothing
         // beyond that (schedule, fees) is public, so nothing beyond that is claimed.
-        hasCourseInstance: branchSchemas.filter((_, index) => branches[index].teachesAllClasses !== false).map((branch) => ({
+        hasCourseInstance: branchSchemas.filter((_, index) => branches[index].classes?.includes(page.route) ?? true).map((branch) => ({
           '@type': 'CourseInstance',
           courseMode: 'onsite',
           location: { '@id': branch['@id'] },

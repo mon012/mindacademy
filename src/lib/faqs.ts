@@ -36,7 +36,7 @@ export const faqsByRoute: Record<string, FaqEntry[]> = {
     },
     {
       question: 'Mind Academy เปิดสอน Singapore Math ที่สาขาไหนบ้าง?',
-      answer: 'เปิดสอนครบทั้ง 4 สาขา ได้แก่ <a href="/contact/#branch-bangna">สาขาบางนา</a> (สมุทรปราการ), <a href="/contact/#branch-crystal-ramintra">สาขาเดอะคริสตัล รามอินทรา</a> (ลาดพร้าว กรุงเทพฯ), <a href="/contact/#branch-crystal-ratchaphruek">สาขาเดอะคริสตัล ราชพฤกษ์</a> (นนทบุรี) และ <a href="/contact/#branch-robinson-ratchaphruek">สาขาโรบินสัน ราชพฤกษ์</a> (ปากเกร็ด นนทบุรี) ดูแผนที่และเบอร์โทรของแต่ละสาขาได้ที่หน้า <a href="/contact/">ติดต่อเรา</a>',
+      answer: 'เปิดสอนครบทั้ง 5 สาขา ได้แก่ <a href="/contact/#branch-bangna">สาขาบางนา</a> (สมุทรปราการ), <a href="/contact/#branch-crystal-ramintra">สาขาเดอะคริสตัล รามอินทรา</a> (ลาดพร้าว กรุงเทพฯ), <a href="/contact/#branch-crystal-ratchaphruek">สาขาเดอะคริสตัล ราชพฤกษ์</a> (นนทบุรี) <a href="/contact/#branch-robinson-ratchaphruek">สาขาโรบินสัน ราชพฤกษ์</a> (ปากเกร็ด นนทบุรี) และ <a href="/contact/#branch-happitat">สาขา Happitat Thailand</a> (บางนา สมุทรปราการ) ดูแผนที่และเบอร์โทรของแต่ละสาขาได้ที่หน้า <a href="/contact/">ติดต่อเรา</a>',
     },
     {
       question: 'ค่าเรียน Singapore Math ที่ Mind Academy เท่าไหร่?',
