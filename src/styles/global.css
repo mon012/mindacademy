@@ -1055,3 +1055,28 @@ a:hover { color: var(--orange-dark); }
 .page-content .gb-container .gb-grid-wrapper.gb-grid-wrapper-7454207e.sam-videos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 28px); padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
 .sam-videos > .gb-grid-column { grid-column: auto; }
 @media (max-width: 760px) { .page-content .gb-container .gb-grid-wrapper.gb-grid-wrapper-7454207e.sam-videos { grid-template-columns: 1fr; } }
+/* SAM: "what is" and "benefits" side by side instead of two stacked lists. */
+.sam-intro { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(20px, 3vw, 36px); align-items: stretch; }
+.sam-intro h2 { margin: 0 0 16px; color: var(--navy); font-size: clamp(1.7rem, 2.8vw, 2.4rem); line-height: 1.2; }
+.sam-intro__what { display: flex; flex-direction: column; padding: clamp(24px, 3.4vw, 40px); border: 2px solid var(--navy); border-radius: 18px; background: var(--leaf); }
+.sam-intro__what p { margin: 0; line-height: 1.75; }
+.sam-intro__cpa { display: flex; gap: 8px; margin: auto 0 0; padding: 24px 0 0; list-style: none; counter-reset: cpa; }
+.sam-intro__cpa li { flex: 1; display: grid; gap: 2px; padding: 10px 8px; border-radius: 12px; background: var(--white); text-align: center; line-height: 1.3; }
+.sam-intro__cpa li + li { position: relative; }
+.sam-intro__cpa strong { color: var(--navy); font-size: .95rem; }
+.sam-intro__cpa span { color: var(--muted); font-size: .82rem; }
+.sam-intro__benefits { padding: clamp(8px, 1.4vw, 16px) 0; }
+.sam-benefits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.sam-benefits li { display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 2px solid var(--navy); border-radius: 16px; background: var(--white); line-height: 1.55; }
+.sam-benefits li:nth-child(1) .sam-benefit__icon { background: var(--lavender); }
+.sam-benefits li:nth-child(2) .sam-benefit__icon { background: var(--peach); }
+.sam-benefits li:nth-child(3) .sam-benefit__icon { background: var(--aqua); }
+.sam-benefits li:nth-child(4) .sam-benefit__icon { background: var(--leaf); }
+.sam-benefit__icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: var(--navy); }
+.sam-benefit__icon svg { width: 22px; height: 22px; }
+@media (max-width: 820px) { .sam-intro { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .sam-benefits { grid-template-columns: 1fr; } }
+.page-content .sam-intro ul.sam-benefits, .page-content .sam-intro ol.sam-intro__cpa { margin-left: 0; padding-left: 0; }
+.page-content .sam-intro .sam-benefits li, .page-content .sam-intro .sam-intro__cpa li { margin: 0; }
+.page-content .sam-intro li::before, .page-content .sam-intro li::marker { content: none; }
+@media (max-width: 480px) { .sam-benefits li { flex-direction: row; align-items: center; padding: 14px 16px; } .sam-benefit__icon { flex: 0 0 auto; } }
