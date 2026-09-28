@@ -1087,3 +1087,15 @@ a:hover { color: var(--orange-dark); }
 .page-content .sam-intro .sam-intro__cpa li:nth-child(3) { --bubble: var(--aqua); animation-delay: -3.2s; }
 .sam-intro__cpa span { color: var(--navy); opacity: .7; }
 @media (prefers-reduced-motion: reduce) { .page-content .sam-intro .sam-intro__cpa li { animation: none; } }
+/* SAM branch list as sea bubbles linking to each branch on /contact/. */
+.page-content .sam-extra ul.sam-branches { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(12px, 2.2vw, 26px); margin: 0; padding: 0; }
+.page-content .sam-extra .sam-branches li { --bubble: var(--leaf); margin: 0; padding: 0; border: 0; background: none; animation: bubble-float 5s ease-in-out infinite; }
+.page-content .sam-extra .sam-branches li:nth-child(2) { --bubble: var(--lavender); animation-delay: -1s; }
+.page-content .sam-extra .sam-branches li:nth-child(3) { --bubble: var(--peach); animation-delay: -2s; }
+.page-content .sam-extra .sam-branches li:nth-child(4) { --bubble: var(--aqua); animation-delay: -3s; }
+.page-content .sam-extra .sam-branches li:nth-child(5) { animation-delay: -4s; }
+.page-content .sam-extra .sam-branches li:nth-child(even) { margin-top: clamp(10px, 2vw, 24px); }
+.page-content .sam-extra .sam-branches a { width: clamp(132px, 15vw, 168px); aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 16px; border: 2px solid var(--navy); border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 85%) 0 9%, transparent 10%), radial-gradient(circle at 70% 78%, rgb(255 255 255 / 40%) 0 5%, transparent 6%), radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--bubble) 55%, white), var(--bubble) 70%); box-shadow: inset -8px -10px 18px rgb(9 41 59 / 10%), 0 10px 22px rgb(9 41 59 / 12%); color: var(--navy); line-height: 1.25; text-align: center; text-decoration: none; transition: transform .2s ease; }
+.page-content .sam-extra .sam-branches a:hover, .page-content .sam-extra .sam-branches a:focus-visible { background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 85%) 0 9%, transparent 10%), var(--orange); transform: scale(1.06); }
+.page-content .sam-extra .sam-branches span { color: var(--navy); opacity: .7; font-size: .85rem; }
+@media (prefers-reduced-motion: reduce) { .page-content .sam-extra .sam-branches li { animation: none; } }
