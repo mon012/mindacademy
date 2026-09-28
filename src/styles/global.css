@@ -1014,3 +1014,26 @@ a:hover { color: var(--orange-dark); }
   .page-id-1802 .gb-container-2d92794e h2,
   .page-id-1802 .gb-container-cee49689 > h2 { font-size: 30px; }
 }
+.page-id-354 .branch-new-badge { display: inline-block; margin: 0 0 12px; padding: 4px 12px; border-radius: 999px; background: var(--orange); color: var(--navy); font-size: .9rem; font-weight: 700; }
+.page-id-354 .gb-button[href*='maps.app.goo.gl'] { border-color: var(--navy); background: var(--navy); color: white; }
+.sam-extra { width: min(1080px, calc(100% - 48px)); margin: clamp(48px, 7vw, 88px) auto 0; }
+.sam-extra h2 { margin: clamp(40px, 5vw, 64px) 0 20px; color: var(--navy); font-size: clamp(1.9rem, 3.4vw, 2.8rem); text-align: center; }
+.sam-extra h2:first-child { margin-top: 0; }
+.sam-facts, .sam-branches { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.sam-facts li, .sam-branches li { display: grid; gap: 4px; padding: 20px; border: 2px solid var(--navy); border-radius: 14px; background: var(--white); text-align: center; }
+.sam-facts strong { color: var(--navy); font-size: clamp(1.8rem, 3vw, 2.4rem); }
+.sam-facts span, .sam-branches span { color: var(--muted); }
+.sam-branches li { text-align: left; background: var(--leaf); }
+.sam-branch__name { color: var(--navy); font-weight: 700; }
+.sam-steps { width: min(760px, 100%); margin: 0 auto; padding-left: 1.4em; line-height: 1.72; }
+.sam-steps li { margin-bottom: 12px; }
+.sam-branches__more { margin-top: 16px; text-align: center; }
+.sam-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 560px) { .sam-facts { grid-template-columns: 1fr; } }
+.answer-box { margin: 28px 0; padding: 20px 24px; border: 2px solid var(--navy); border-radius: 14px; background: var(--leaf); }
+.answer-box p { margin: 0; line-height: 1.72; }
+.single-content .wp-block-table { overflow-x: auto; margin: 24px 0; }
+.single-content .wp-block-table table { width: 100%; border-collapse: collapse; }
+.single-content .wp-block-table th, .single-content .wp-block-table td { padding: 12px 14px; border: 1px solid var(--rule); text-align: left; vertical-align: top; }
+.single-content .wp-block-table th { background: var(--leaf); color: var(--navy); }
+.single-content .wp-block-table td:first-child { white-space: nowrap; }

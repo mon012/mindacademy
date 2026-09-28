@@ -79,7 +79,7 @@ const organizationSchema = {
   name: 'Mind Academy',
   url: `${productionOrigin}/`,
   logo: absoluteUrl('/assets/wp-content/uploads/2024/09/MA320.webp'),
-  description: 'ศูนย์การเรียนรู้สำหรับเด็กอายุ 4-12 ปี หลักสูตรหลักที่เปิดสอนคือ Singapore Math (S.A.M) หลักสูตรลิขสิทธิ์จากสิงคโปร์ พร้อมคลาสภาษาไทยสำหรับเด็กนักเรียนอินเตอร์ ภาษาอังกฤษ Coding และ AI เปิดสอนที่ 4 สาขาในกรุงเทพฯ และปริมณฑล',
+  description: 'ศูนย์การเรียนรู้สำหรับเด็กอายุ 4-12 ปี หลักสูตรหลักที่เปิดสอนคือ Singapore Math (S.A.M) หลักสูตรลิขสิทธิ์จากสิงคโปร์ พร้อมคลาสภาษาไทยสำหรับเด็กนักเรียนอินเตอร์ ภาษาอังกฤษ Coding และ AI เปิดสอนที่ 5 สาขาในกรุงเทพฯ และปริมณฑล',
   telephone: branches[0].telephone,
   email: 'mindschool.2018@gmail.com',
   areaServed: ['กรุงเทพมหานคร', 'นนทบุรี', 'สมุทรปราการ'],
@@ -134,9 +134,9 @@ const primarySchema = page.kind === 'article-page'
         url: pageUrl,
         provider: { '@id': organizationId },
         inLanguage: 'th-TH',
-        // Every class is taught in person at all four branches; nothing beyond
-        // that (schedule, fees) is public, so nothing beyond that is claimed.
-        hasCourseInstance: branchSchemas.map((branch) => ({
+        // Every class is taught in person at each established branch; nothing
+        // beyond that (schedule, fees) is public, so nothing beyond that is claimed.
+        hasCourseInstance: branchSchemas.filter((_, index) => branches[index].teachesAllClasses !== false).map((branch) => ({
           '@type': 'CourseInstance',
           courseMode: 'onsite',
           location: { '@id': branch['@id'] },
@@ -408,7 +408,7 @@ const embedHosts = [...new Set([
     <section class="ocean-hero" aria-labelledby="ocean-title">
       <div class="ocean-copy">
         <h1 id="ocean-title">Mind Academy<br />เรียนสนุก เข้าใจจริง<br />เติบโตอย่างมั่นใจ</h1>
-        <p>ศูนย์การเรียนรู้สำหรับเด็ก 4-12 ปี หลักสูตรหลักที่เปิดสอนคือ Singapore Math (S.A.M) พร้อมคลาสภาษาไทยสำหรับเด็กอินเตอร์ ภาษาอังกฤษ และ Coding &amp; AI ที่ 4 สาขาในกรุงเทพฯ และปริมณฑล</p>
+        <p>ศูนย์การเรียนรู้สำหรับเด็ก 4-12 ปี หลักสูตรหลักที่เปิดสอนคือ Singapore Math (S.A.M) พร้อมคลาสภาษาไทยสำหรับเด็กอินเตอร์ ภาษาอังกฤษ และ Coding &amp; AI ที่ 5 สาขาในกรุงเทพฯ และปริมณฑล</p>
         <div class="ocean-actions"><a class="primary-ocean-action" href="/classes/sam/">ดูหลักสูตร Singapore Math</a><a class="secondary-ocean-action" href="/classes/">ดูคลาสเรียนทั้งหมด</a></div>
       </div>
       <div class="octopus-navigator">

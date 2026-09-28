@@ -1,5 +1,5 @@
 /**
- * The four Mind Academy branches, transcribed from the contact page.
+ * The Mind Academy branches, transcribed from the contact page.
  *
  * Addresses and phone numbers are copied verbatim from the visible copy on
  * /contact/, and each coordinate pair is read from that branch's own Google
@@ -16,6 +16,11 @@ export interface Branch {
   telephone: string;
   latitude: number;
   longitude: number;
+  /**
+   * False until the branch's class list is confirmed; class pages only list
+   * branches known to teach every class as course locations.
+   */
+  teachesAllClasses?: boolean;
 }
 
 export const branches: Branch[] = [
@@ -58,5 +63,17 @@ export const branches: Branch[] = [
     telephone: '+66980591444',
     latitude: 13.935628,
     longitude: 100.458166,
+  },
+  {
+    // Opened September 2026. Coordinates are from its Google Maps place pin.
+    name: 'Mind Academy สาขา Happitat Thailand',
+    anchor: 'branch-happitat',
+    streetAddress: 'Happitat Thailand ชั้น 5 อาคาร Bloominas',
+    addressLocality: 'บางพลี',
+    addressRegion: 'สมุทรปราการ',
+    telephone: '+66659528883',
+    latitude: 13.656802,
+    longitude: 100.667153,
+    teachesAllClasses: false,
   },
 ];
