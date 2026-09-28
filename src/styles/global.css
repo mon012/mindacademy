@@ -1040,3 +1040,15 @@ a:hover { color: var(--orange-dark); }
    (forced tall by the global rule above) stacked on top of it as dead space. */
 .single-content .wp-block-spacer { display: none; }
 .single-content .wp-block-separator + h2 { margin-top: 1.2em; }
+/* Branch picker as underwater bubbles, matching the sea theme of the banner. */
+.page-id-354 .branch-jump ul { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(14px, 2.4vw, 28px); }
+.page-id-354 .branch-jump li { --bubble: var(--leaf); animation: bubble-float 5s ease-in-out infinite; }
+.page-id-354 .branch-jump li:nth-child(2) { --bubble: var(--lavender); animation-delay: -1s; }
+.page-id-354 .branch-jump li:nth-child(3) { --bubble: var(--peach); animation-delay: -2s; }
+.page-id-354 .branch-jump li:nth-child(4) { --bubble: var(--aqua); animation-delay: -3s; }
+.page-id-354 .branch-jump li:nth-child(5) { --bubble: var(--leaf); animation-delay: -4s; }
+.page-id-354 .branch-jump li:nth-child(even) { margin-top: clamp(10px, 2vw, 26px); }
+.page-id-354 .branch-jump a { position: relative; width: clamp(138px, 16vw, 176px); aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px; border: 2px solid var(--navy); border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 85%) 0 9%, transparent 10%), radial-gradient(circle at 70% 78%, rgb(255 255 255 / 40%) 0 5%, transparent 6%), radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--bubble) 55%, white), var(--bubble) 70%); box-shadow: inset -8px -10px 18px rgb(9 41 59 / 10%), 0 10px 22px rgb(9 41 59 / 12%); line-height: 1.25; text-align: center; transition: transform .2s ease, background-color .2s ease; }
+.page-id-354 .branch-jump a:hover, .page-id-354 .branch-jump a:focus-visible { background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 85%) 0 9%, transparent 10%), var(--orange); transform: scale(1.06); }
+@keyframes bubble-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .page-id-354 .branch-jump li { animation: none; } }
